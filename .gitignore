@@ -4,6 +4,8 @@
 
 out/
 photomath.json
+src/main/resources/application-dev.yml
+
 
 ### STS ###
 .apt_generated
