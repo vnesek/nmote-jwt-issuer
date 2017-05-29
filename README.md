@@ -1,0 +1,1 @@
+JWT token issuer with delegated authentification (google, facebook, twitter)
