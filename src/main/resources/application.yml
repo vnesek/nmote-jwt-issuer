@@ -1,0 +1,40 @@
+spring:
+  jackson:
+    serialization:
+      indentOutput: true
+
+  main:
+    bannerMode: 'off'
+
+logging:
+  config: classpath:logback.xml
+
+issuer:
+  # Create file with empty arrar (i.e. '[]') in project directory
+  users: users.json
+
+  facebook:
+    id: <app-id>
+    secret: <secret>
+    callback: http://localhost:8080/facebook/callback
+    scope: public_profile,email
+
+  twitter:
+    id: <app-id>
+    secret: <secret>
+    callback: http://localhost:8080/twitter/callback
+
+  google:
+    id: <app-id>
+    secret: <secret>
+    callback: http://localhost:8080/google/callback
+    scope: email
+
+  applications:
+    demo0:
+      audience: https://translator.photomath.net
+      secret: HS256:r3LG69+9J4dOT0AbG5bMwPLFVPGm19tnsWX2ia61ZPo=
+      success: http://localhost:8080/demo0
+    demo1:
+      secret: HS256:Jc4BSD2rzAH4pnzCHt4qscAGzhaIFlcOGdjhhM8JaKk=
+      success: http://localhost:8080/demo1
