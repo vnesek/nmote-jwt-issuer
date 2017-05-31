@@ -2,6 +2,10 @@ package com.nmote.jwti.repository
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.scribejava.core.model.OAuth1AccessToken
+import com.github.scribejava.core.model.OAuth2AccessToken
+import com.nmote.jwti.model.JwtiOAuth1AccessToken
+import com.nmote.jwti.model.JwtiOAuth2AccessToken
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.User
 import org.slf4j.LoggerFactory
@@ -45,7 +49,7 @@ class DefaultUserRepository @Autowired constructor(
         }
     }
 
-    override fun findOrCreate(account: SocialAccount): User {
+    override fun findOrCreate(account: SocialAccount<*>): User {
         synchronized(this) {
             val id = account.socialAccountId
             val user = users[id] ?: User(account)
@@ -53,6 +57,13 @@ class DefaultUserRepository @Autowired constructor(
             if (account.profileEmail != null) user.profileEmail = account.profileEmail
             if (account.profileImageURL != null) user.profileImageURL = account.profileImageURL
             if (account.profileName != null) user.profileName = account.profileName
+
+            val accessToken = account.accessToken
+            user.accessToken = when (accessToken) {
+                is OAuth2AccessToken -> JwtiOAuth2AccessToken(accessToken)
+                is OAuth1AccessToken -> JwtiOAuth1AccessToken(accessToken)
+                else -> null
+            }
 
             return save(user)
         }

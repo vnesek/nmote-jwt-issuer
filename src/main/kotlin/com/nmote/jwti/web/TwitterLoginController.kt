@@ -46,12 +46,14 @@ class TwitterLoginController(
             return service.getAuthorizationUrl(requestToken)
         }
 
-    override fun getSocialAccount(accessToken: OAuth1AccessToken): SocialAccount {
+    override fun getSocialAccount(accessToken: OAuth1AccessToken): SocialAccount<OAuth1AccessToken> {
         val request = OAuthRequest(Verb.GET, "https://api.twitter.com/1.1/account/verify_credentials.json") //,service);
         service.signRequest(accessToken, request)
         val response = service.execute(request)
         val body = response.body
-        return objectMapper.readValue(body, TwitterAccount::class.java)
+        val account = objectMapper.readValue(body, TwitterAccount::class.java)
+        account.accessToken = accessToken
+        return account
     }
 
 }

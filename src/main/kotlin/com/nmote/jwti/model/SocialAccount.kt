@@ -3,7 +3,7 @@ package com.nmote.jwti.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.io.Serializable
 
-interface SocialAccount : Serializable {
+interface SocialAccount<T> : Serializable {
 
     val profileEmail: String?
 
@@ -18,4 +18,6 @@ interface SocialAccount : Serializable {
     val socialAccountId: String
         @JsonIgnore
         get() = String.format("%s:%s", socialService, accountId)
+
+    val accessToken: T?
 }

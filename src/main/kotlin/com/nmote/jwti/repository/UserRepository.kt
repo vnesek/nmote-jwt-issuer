@@ -10,7 +10,7 @@ interface UserRepository {
 
     fun findById(id: String): User?
 
-    fun findOrCreate(account: SocialAccount): User
+    fun findOrCreate(account: SocialAccount<*>): User
 
     fun save(user: User): User
 }

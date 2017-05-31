@@ -6,7 +6,7 @@ class User : BasicSocialAccount {
 
     constructor() : super()
 
-    constructor(account: SocialAccount) : super(account)
+    constructor(account: SocialAccount<*>) : super(account)
 
     @JsonIgnore
     var password: String = "none"

@@ -3,9 +3,9 @@ buildscript {
         kotlinVersion = "1.1.2-4"
         springBootVersion = "1.5.3.RELEASE"
         ningVersion = "1.9.38"
-        restfbVersion = "1.35.0"
-        scribejavaVersion = "4.0.0"
-        ahcVersion = "2.0.26"
+        restfbVersion = "1.41.0"
+        scribejavaVersion = "4.1.1"
+        ahcVersion = "2.0.30"
     }
     repositories {
         mavenCentral()
@@ -19,7 +19,7 @@ buildscript {
 
 plugins {
     //id "com.gorylenko.gradle-git-properties" version "1.4.17"
-    id "com.github.ben-manes.versions" version "0.14.0"
+    id "com.github.ben-manes.versions" version "0.15.0"
 }
 
 

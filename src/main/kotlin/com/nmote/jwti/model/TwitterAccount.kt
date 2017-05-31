@@ -2,10 +2,13 @@ package com.nmote.jwti.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.scribejava.core.model.OAuth1AccessToken
 import java.io.Serializable
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class TwitterAccount : SocialAccount, Serializable {
+class TwitterAccount : SocialAccount<OAuth1AccessToken>, Serializable {
+
+    override var accessToken: OAuth1AccessToken? = null
 
     @JsonProperty("email")
     override val profileEmail: String? = null

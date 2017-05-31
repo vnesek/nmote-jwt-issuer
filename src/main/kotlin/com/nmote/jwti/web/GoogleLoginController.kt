@@ -39,12 +39,14 @@ constructor(
         return callback(accessToken, appId, response)
     }
 
-    override fun getSocialAccount(accessToken: OAuth2AccessToken): SocialAccount {
+    override fun getSocialAccount(accessToken: OAuth2AccessToken): SocialAccount<OAuth2AccessToken> {
         val request = OAuthRequest(Verb.GET, "https://www.googleapis.com/plus/v1/people/me")
         service.signRequest(accessToken, request)
         val response = service.execute(request)
         val body = response.body
-        return objectMapper.readValue(body, GoogleAccount::class.java)
+        val account = objectMapper.readValue(body, GoogleAccount::class.java)
+        account.accessToken = accessToken
+        return account
     }
 
     override val authorizationUrl: String

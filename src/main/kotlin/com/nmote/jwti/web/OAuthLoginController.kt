@@ -1,6 +1,7 @@
 package com.nmote.jwti.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth2AccessToken
 import com.github.scribejava.core.model.Token
 import com.github.scribejava.core.oauth.OAuthService
@@ -53,7 +54,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
 
         val app = apps[appId] ?: return "redirect:/unknown-application"
 
-        val account: SocialAccount
+        val account: SocialAccount<T>
         try {
             account = getSocialAccount(accessToken)
             // log.debug("Personal information {}", account)
@@ -64,7 +65,12 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
 
         val user = users.findOrCreate(account)
 
-        val expiresIn = (accessToken as OAuth2AccessToken).expiresIn ?: 6000
+        val expiresIn = when (accessToken) {
+            is OAuth2AccessToken -> accessToken.expiresIn!!
+            is OAuth1AccessToken -> 6000
+            else -> 6000
+        }
+
         val key = app.key
         val jws = Jwts.builder()
                 .setAudience(app.audience)
@@ -84,7 +90,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
 
     protected abstract val authorizationUrl: String
 
-    protected abstract fun getSocialAccount(accessToken: T): SocialAccount
+    protected abstract fun getSocialAccount(accessToken: T): SocialAccount<T>
 
     protected val log = LoggerFactory.getLogger(javaClass)!!
 

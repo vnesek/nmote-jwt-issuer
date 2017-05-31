@@ -46,6 +46,7 @@ class FacebookLoginController(
         val fields = "id,bio,birthday,email,first_name,last_name,gender,hometown,interested_in,location,middle_name,name,website"
         val account = facebookClient.fetchObject("me", FacebookAccount::class.java, //
                 Parameter.with("fields", fields))
+        account.accessToken = accessToken
         return account
     }
 

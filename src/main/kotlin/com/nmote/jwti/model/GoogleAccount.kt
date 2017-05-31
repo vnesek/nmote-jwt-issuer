@@ -3,6 +3,7 @@ package com.nmote.jwti.model
 import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.github.scribejava.core.model.OAuth2AccessToken
 import com.nmote.jwti.trimToNull
 import java.io.Serializable
 
@@ -41,7 +42,9 @@ class Range : Serializable {
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-class GoogleAccount : SocialAccount, Serializable {
+class GoogleAccount : SocialAccount<OAuth2AccessToken>, Serializable {
+
+    override var accessToken: OAuth2AccessToken? = null
 
     override val profileName: String?
         get() {

@@ -1,9 +1,10 @@
 package com.nmote.jwti.model
 
 
+import com.github.scribejava.core.model.OAuth2AccessToken
 import com.restfb.types.User
 
-class FacebookAccount : User(), SocialAccount {
+class FacebookAccount : User(), SocialAccount<OAuth2AccessToken> {
 
     override val profileEmail: String?
         get() = email
@@ -20,5 +21,8 @@ class FacebookAccount : User(), SocialAccount {
     override val socialService: String
         get() = "facebook"
 
-    var accessToken: String? = null
+    //var accessToken: String? = null
+
+    override var accessToken: OAuth2AccessToken? = null
+
 }
