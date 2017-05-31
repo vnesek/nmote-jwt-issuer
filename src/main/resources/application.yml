@@ -13,6 +13,8 @@ issuer:
   # Create file with empty arrar (i.e. '[]') in project directory
   users: users.json
 
+  url: http://my-issuer-url
+
   facebook:
     id: <app-id>
     secret: <secret>

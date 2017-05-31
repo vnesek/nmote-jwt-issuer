@@ -2,10 +2,7 @@ package com.nmote.jwti.repository
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.scribejava.core.model.OAuth1AccessToken
-import com.github.scribejava.core.model.OAuth2AccessToken
-import com.nmote.jwti.model.JwtiOAuth1AccessToken
-import com.nmote.jwti.model.JwtiOAuth2AccessToken
+import com.nmote.jwti.model.BasicSocialAccount
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.User
 import org.slf4j.LoggerFactory
@@ -29,47 +26,34 @@ class DefaultUserRepository @Autowired constructor(
         val mapper: ObjectMapper
 ) : UserRepository {
 
-    private fun getLastModifiedFileTime() = Files.getLastModifiedTime(Paths.get(usersFile))
+    private val log = LoggerFactory.getLogger(javaClass)
 
     var lastModified: FileTime = getLastModifiedFileTime()
 
-    var users: MutableMap<String, User> = loadUsers()
+    var users: MutableList<User> = loadUsers()
 
-    override fun findByEmail(email: String): User? {
-        synchronized(this) {
-            refreshUsers()
-            return users[email]
-        }
-    }
-
-    override fun findById(id: String): User? {
-        synchronized(this) {
-            refreshUsers()
-            return users[id]
-        }
+    private fun getLastModifiedFileTime() = try {
+        Files.getLastModifiedTime(Paths.get(usersFile))
+    } catch(ignored: Exception) {
+        FileTime.from(Instant.now())
     }
 
     override fun findOrCreate(account: SocialAccount<*>): User {
         synchronized(this) {
-            val id = account.socialAccountId
-            val user = users[id] ?: User(account)
-
-            if (account.profileEmail != null) user.profileEmail = account.profileEmail
-            if (account.profileImageURL != null) user.profileImageURL = account.profileImageURL
-            if (account.profileName != null) user.profileName = account.profileName
-
-            val accessToken = account.accessToken
-            user.accessToken = when (accessToken) {
-                is OAuth2AccessToken -> JwtiOAuth2AccessToken(accessToken)
-                is OAuth1AccessToken -> JwtiOAuth1AccessToken(accessToken)
-                else -> null
-            }
-
+            refresh()
+            val user = (this[account] ?: User())
+            user.plus(account as? BasicSocialAccount ?: BasicSocialAccount(account))
             return save(user)
         }
     }
 
-    fun refreshUsers() {
+    private operator fun get(account: SocialAccount<*>): User?
+            = users.filter { it[account.accountId, account.socialService] != null }.firstOrNull()
+
+    private operator fun get(id: String): User?
+            = users.filter { it.accountId == id }.firstOrNull()
+
+    fun refresh() {
         synchronized(this) {
             if (lastModified.toInstant().isBefore(Instant.now().plusSeconds(15))) {
                 try {
@@ -77,12 +61,11 @@ class DefaultUserRepository @Autowired constructor(
                     if (lastModified < lm) {
                         users = loadUsers()
                         lastModified = lm
-                        log.debug("Reloaded {} users from {}", users.size, usersFile)
+                        // log.debug("Reloaded {} users from {}", users.size, usersFile)
                     }
                 } catch (ioe: IOException) {
                     log.error("Failed to read {}", usersFile, ioe)
                 }
-
             }
         }
     }
@@ -90,13 +73,11 @@ class DefaultUserRepository @Autowired constructor(
     override fun save(user: User): User {
         synchronized(this) {
             try {
-                val existing = users[user.socialAccountId]
-                if (user !== existing) {
-                    users[user.socialAccountId] = user
-                    mapper.writeValue(File(usersFile), users.values)
-                    this.lastModified = getLastModifiedFileTime()
-                    log.debug("Saved {}", usersFile)
-                }
+                users.remove(user)
+                users.add(user)
+                mapper.writeValue(File(usersFile), users)
+                lastModified = getLastModifiedFileTime()
+                log.debug("Saved {} users to {}", users.size, usersFile)
             } catch (ignored: IOException) {
                 log.error("Failed to save {}", usersFile)
             }
@@ -104,12 +85,17 @@ class DefaultUserRepository @Autowired constructor(
         return user
     }
 
-    private fun loadUsers(): MutableMap<String, User> {
-        val users = mutableMapOf<String, User>()
-        mapper.readValue<List<User>>(File(usersFile), LIST_OF_USERS)
-                .associateByTo(users, User::socialAccountId)
-        return users
-    }
+    private fun loadUsers(): MutableList<User> {
+        var result: MutableList<User>
+        try {
+            result = mapper.readValue<List<User>>(File(usersFile), LIST_OF_USERS).toMutableList()
+            log.info("Loaded {} users from {}", result.size, usersFile)
+        } catch (ex: Throwable) {
+            log.error("Failed to load {}, will create empty one: {}", usersFile, ex.toString())
+            result = mutableListOf<User>()
+            mapper.writeValue(File(usersFile), result)
 
-    private val log = LoggerFactory.getLogger(javaClass)
+        }
+        return result
+    }
 }
