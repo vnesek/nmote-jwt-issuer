@@ -3,7 +3,7 @@ buildscript {
         kotlinVersion = "1.1.2-4"
         springBootVersion = "1.5.3.RELEASE"
         ningVersion = "1.9.38"
-        restfbVersion = "1.41.0"
+        restfbVersion = "1.41.0-PC"
         scribejavaVersion = "4.1.1"
         ahcVersion = "2.0.30"
     }
@@ -41,6 +41,7 @@ compileTestKotlin {
 
 repositories {
     mavenCentral()
+    mavenLocal()
     jcenter()
 }
 
@@ -52,6 +53,7 @@ dependencies {
     compile "com.github.scribejava:scribejava-apis:$scribejavaVersion"
     compile "com.github.scribejava:scribejava-httpclient-ahc:$scribejavaVersion"
     compile "org.asynchttpclient:async-http-client:$ahcVersion"
+    compile "org.springframework.boot:spring-boot-starter-data-mongodb"
     compile "com.restfb:restfb:$restfbVersion"
     compile "io.jsonwebtoken:jjwt:0.7.0"
 

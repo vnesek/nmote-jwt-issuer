@@ -3,11 +3,14 @@ package com.nmote.jwti.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.hibernate.validator.constraints.Email
+import org.springframework.data.annotation.Id
 import java.io.Serializable
+import java.time.Instant
 import java.util.*
 
 class User : SocialAccount<JwtiAccessToken>, Serializable {
 
+    @Id
     @JsonProperty("id")
     override val accountId: String = UUID.randomUUID().toString()
 
@@ -38,6 +41,8 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
     var roles: Map<String, Set<String>> = emptyMap()
 
     var accounts: List<BasicSocialAccount> = emptyList()
+
+    var createdAt: Instant = Instant.now()
 
     operator fun get(id: String, service: String): BasicSocialAccount?
             = accounts.find { it.socialService == service && it.accountId == id }

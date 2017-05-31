@@ -8,6 +8,7 @@ import com.github.scribejava.core.oauth.OAuthService
 import com.nmote.jwti.model.AppRepository
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.repository.UserRepository
+import com.nmote.jwti.repository.findOrCreate
 import io.jsonwebtoken.Jwts
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.RequestMapping

@@ -10,8 +10,9 @@ logging:
   config: classpath:logback.xml
 
 issuer:
-  # Create file with empty arrar (i.e. '[]') in project directory
-  users: users.json
+  repository:
+    file: false
+    mongo: false
 
   url: http://my-issuer-url
 

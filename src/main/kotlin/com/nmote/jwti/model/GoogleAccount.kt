@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.github.scribejava.core.model.OAuth2AccessToken
 import com.nmote.jwti.trimToNull
+import org.springframework.data.annotation.Transient
 import java.io.Serializable
 
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Email : Serializable {
@@ -17,6 +20,7 @@ class Email : Serializable {
     var value: String? = null
 }
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Image : Serializable {
@@ -25,6 +29,7 @@ class Image : Serializable {
     var url: String? = null
 }
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Name : Serializable {
@@ -33,6 +38,7 @@ class Name : Serializable {
     var givenName: String? = null
 }
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Range : Serializable {
@@ -41,13 +47,16 @@ class Range : Serializable {
     var min: Int? = null
 }
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 class GoogleAccount : SocialAccount<OAuth2AccessToken>, Serializable {
 
+    @get:Transient
     @get:JsonIgnore
     override var accessToken: OAuth2AccessToken? = null
 
+    @get:Transient
     @get:JsonIgnore
     override val profileName: String?
         get() {
@@ -73,10 +82,12 @@ class GoogleAccount : SocialAccount<OAuth2AccessToken>, Serializable {
             return result
         }
 
+    @get:Transient
     @get:JsonIgnore
     override val accountId: String
         get() = id ?: "?"
 
+    @get:Transient
     @get:JsonIgnore
     override val profileEmail: String?
         get() {
@@ -84,10 +95,12 @@ class GoogleAccount : SocialAccount<OAuth2AccessToken>, Serializable {
             return if (e != null && !e.isEmpty()) e[0].value else null
         }
 
+    @get:Transient
     @get:JsonIgnore
     override val profileImageURL: String?
         get() = image?.url
 
+    @get:Transient
     @get:JsonIgnore
     override val socialService: String
         get() = "google"

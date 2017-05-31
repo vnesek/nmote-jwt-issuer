@@ -2,7 +2,6 @@ package com.nmote.jwti.repository
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.nmote.jwti.model.BasicSocialAccount
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.User
 import org.slf4j.LoggerFactory
@@ -19,10 +18,10 @@ import java.time.Instant
 
 private val LIST_OF_USERS = object : TypeReference<List<User>>() {}
 
-@ConditionalOnProperty("issuer.users")
+@ConditionalOnProperty("issuer.repository.file")
 @Repository
-class DefaultUserRepository @Autowired constructor(
-        @Value("\${issuer.users}") val usersFile: String,
+class FileUserRepository @Autowired constructor(
+        @Value("\${issuer.repository.file}") val usersFile: String,
         val mapper: ObjectMapper
 ) : UserRepository {
 
@@ -38,17 +37,15 @@ class DefaultUserRepository @Autowired constructor(
         FileTime.from(Instant.now())
     }
 
-    override fun findOrCreate(account: SocialAccount<*>): User {
+    override fun findBySocialAccount(accountId: String, socialService: String): User? {
         synchronized(this) {
             refresh()
-            val user = (this[account] ?: User())
-            user.plus(account as? BasicSocialAccount ?: BasicSocialAccount(account))
-            return save(user)
+            return users.filter { it[accountId, socialService] != null }.firstOrNull()
         }
     }
 
     private operator fun get(account: SocialAccount<*>): User?
-            = users.filter { it[account.accountId, account.socialService] != null }.firstOrNull()
+            = findBySocialAccount(account.accountId, account.socialService)
 
     private operator fun get(id: String): User?
             = users.filter { it.accountId == id }.firstOrNull()
