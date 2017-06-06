@@ -40,19 +40,20 @@ class TwitterLoginController(
         @Qualifier("twitterOAuthService") service: OAuth10aService,
         objectMapper: ObjectMapper,
         users: UserRepository,
-        apps: AppRepository
-) : OAuthLoginController<OAuth10aService, OAuth1AccessToken>(service, objectMapper, users, apps) {
+        apps: AppRepository,
+        tokens: TokenCache
+) : OAuthLoginController<OAuth10aService, OAuth1AccessToken>(service, objectMapper, users, apps, tokens) {
 
     @RequestMapping("callback")
     fun callback(
             @RequestParam oauth_token: String,
             @RequestParam oauth_verifier: String,
-            @CookieValue("app") appId: String,
+            @CookieValue("authState") authState: String,
             response: HttpServletResponse
     ): String {
         val requestToken = OAuth1RequestToken(oauth_token, oauth_verifier)
         val accessToken = service.getAccessToken(requestToken, oauth_verifier)
-        return callback(accessToken, appId, response)
+        return callback(accessToken, authState, response)
     }
 
     override val authorizationUrl: String

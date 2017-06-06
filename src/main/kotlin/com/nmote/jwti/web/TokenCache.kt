@@ -13,23 +13,23 @@
  *   limitations under the License.
  */
 
-package com.nmote.jwti.model
+package com.nmote.jwti.web
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import java.io.Serializable
+import org.springframework.stereotype.Component
+import java.util.*
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-interface SocialAccount<out T> : Serializable {
+@Component
+class TokenCache {
 
-    val profileEmail: String?
+    private val tokens: MutableMap<String, String> = mutableMapOf()
 
-    val accountId: String
+    fun put(token: String): String {
+        val code = Math.abs(Random().nextLong()).toString()
+        tokens[code] = token
+        return code
+    }
 
-    val profileImageURL: String?
-
-    val profileName: String?
-
-    val socialService: String
-
-    val accessToken: T?
+    fun get(code: String): String? {
+        return tokens.remove(code)
+    }
 }

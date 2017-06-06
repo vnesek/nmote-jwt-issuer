@@ -27,7 +27,6 @@ import com.nmote.jwti.repository.findOrCreate
 import io.jsonwebtoken.Jwts
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import java.io.IOException
 import java.time.Instant
 import java.util.*
@@ -38,22 +37,25 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
         protected val service: S,
         protected val objectMapper: ObjectMapper,
         protected val users: UserRepository,
-        protected val apps: AppRepository
+        protected val apps: AppRepository,
+        protected val tokens: TokenCache
 ) {
 
     // TODO Filter scopes based on auth request
     @RequestMapping("login")
-    fun login(@RequestParam(name = "app", defaultValue = "default") appId: String, response: HttpServletResponse): String {
-        val app = apps[appId] ?: return "redirect:/unknown-application"
+    fun login(request: OAuth2Request, response: HttpServletResponse
+    ): String {
+        val clientId = request.client_id ?: return "redirect:/missing-client-id"
+        val app = apps[clientId] ?: return "redirect:/unknown-application"
 
-        val cookie = Cookie("app", appId)
+        val cookie = Cookie("authState", Base64.getEncoder().encodeToString(objectMapper.writeValueAsBytes(request)))
         cookie.isHttpOnly = true
         cookie.maxAge = -300
         response.addCookie(cookie)
 
         try {
             val authUrl = authorizationUrl
-            log.debug("Authorizing {} via {}", appId, authUrl)
+            log.debug("Authorizing {} via {}", clientId, authUrl)
             return "redirect:" + authUrl
         } catch (ioe: IOException) {
             log.error("Failed to get auth URL", ioe)
@@ -61,14 +63,16 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
         }
     }
 
-    protected fun callback(accessToken: T, appId: String, response: HttpServletResponse): String {
-        log.debug("Received access token {} for {}", accessToken, appId)
+    protected fun callback(accessToken: T, authState: String, response: HttpServletResponse): String {
+        val request = objectMapper.readValue(Base64.getDecoder().decode(authState), OAuth2Request::class.java)
+        log.debug("Received access token {} for {}", accessToken, request.client_id)
 
         val cookie = Cookie("app", "<deleted>")
         cookie.maxAge = 0
         response.addCookie(cookie)
 
-        val app = apps[appId] ?: return "redirect:/unknown-application"
+        val clientId = request.client_id ?: return "redirect:/missing-client-id"
+        val app = apps[clientId] ?: return "redirect:/unknown-application"
 
         val account: SocialAccount<T>
         try {
@@ -96,13 +100,24 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
                 .claim("email", user.profileEmail)
                 .claim("name", user.profileName)
                 .claim("image", user.profileImageURL)
-                .claim("scope", user.roles[appId])
+                .claim("scope", user.roles[clientId])
                 .signWith(app.algorithm, key)
                 .setExpiration(Date.from(Instant.now().plusSeconds(expiresIn.toLong())))
                 .compact()
 
-        val redirectTo = app.success + "#" + jws
-        log.debug("Redirecting to {}", redirectTo);
+        val code = tokens.put(jws)
+
+        var redirectTo: String
+        if (!request.redirect_uri.isNullOrBlank()) {
+            redirectTo = request.redirect_uri + "?code=$code"
+            if (!request.state.isNullOrBlank()) redirectTo += "&state=${request.state}"
+        } else {
+            redirectTo = app.success
+                    .replace("[token]", jws)
+                    .replace("[code]", code)
+                    .replace("[state]", request.state ?: "")
+        }
+        log.debug("Redirecting to {}", redirectTo)
         return "redirect:" + redirectTo
     }
 

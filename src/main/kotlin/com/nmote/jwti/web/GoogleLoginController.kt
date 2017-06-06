@@ -41,17 +41,18 @@ constructor(
         @Qualifier("googleOAuthService") service: OAuth20Service,
         objectMapper: ObjectMapper,
         users: UserRepository,
-        apps: AppRepository
-) : OAuthLoginController<OAuth20Service, OAuth2AccessToken>(service, objectMapper, users, apps) {
+        apps: AppRepository,
+        tokens: TokenCache
+) : OAuthLoginController<OAuth20Service, OAuth2AccessToken>(service, objectMapper, users, apps, tokens) {
 
     @RequestMapping("callback")
     fun callback(
             @RequestParam code: String,
-            @CookieValue("app") appId: String,
+            @CookieValue("authState") authState: String,
             response: HttpServletResponse
     ): String {
         val accessToken = service.getAccessToken(code)
-        return callback(accessToken, appId, response)
+        return callback(accessToken, authState, response)
     }
 
     override fun getSocialAccount(accessToken: OAuth2AccessToken): SocialAccount<OAuth2AccessToken> {

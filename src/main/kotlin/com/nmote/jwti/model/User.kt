@@ -19,6 +19,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.hibernate.validator.constraints.Email
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Transient
+import org.springframework.data.mongodb.core.mapping.Field
 import java.io.Serializable
 import java.time.Instant
 import java.util.*
@@ -29,20 +31,24 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
     @JsonProperty("id")
     override val accountId: String = UUID.randomUUID().toString()
 
+    @Field("imageURL")
     @JsonProperty("imageURL")
     override val profileImageURL: String? = null
         get() = field ?: firstOrNull(SocialAccount<*>::profileImageURL)
 
+    @Field("name")
     @JsonProperty("name")
     override val profileName: String? = null
         get() = field ?: firstOrNull(SocialAccount<*>::profileName)
 
+    @Transient
     @JsonIgnore
-    override val socialService: String = "user"
+    override val socialService: String = "com.nmote.jwti"
 
     @JsonIgnore
     override val accessToken: JwtiAccessToken? = null
 
+    @Field("email")
     @JsonProperty("email")
     @get:Email
     override val profileEmail: String? = null
