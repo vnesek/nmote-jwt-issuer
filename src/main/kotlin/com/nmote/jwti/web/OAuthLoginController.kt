@@ -43,10 +43,9 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
 
     // TODO Filter scopes based on auth request
     @RequestMapping("login")
-    fun login(request: OAuth2Request, response: HttpServletResponse
-    ): String {
+    fun login(request: OAuth2Request, response: HttpServletResponse): String {
         val clientId = request.client_id ?: return "redirect:/missing-client-id"
-        val app = apps[clientId] ?: return "redirect:/unknown-application"
+        val (_, client) = apps[clientId] ?: return "redirect:/unknown-application"
 
         val cookie = Cookie("authState", Base64.getEncoder().encodeToString(objectMapper.writeValueAsBytes(request)))
         cookie.isHttpOnly = true
@@ -59,7 +58,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
             return "redirect:" + authUrl
         } catch (ioe: IOException) {
             log.error("Failed to get auth URL", ioe)
-            return "redirect:" + app.failure
+            return "redirect:" + client.failure
         }
     }
 
@@ -72,7 +71,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
         response.addCookie(cookie)
 
         val clientId = request.client_id ?: return "redirect:/missing-client-id"
-        val app = apps[clientId] ?: return "redirect:/unknown-application"
+        val (app, client) = apps[clientId] ?: return "redirect:/unknown-application"
 
         val account: SocialAccount<T>
         try {
@@ -80,16 +79,18 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
             // log.debug("Personal information {}", account)
         } catch (e: Exception) {
             log.error("Login failed {}", accessToken, e)
-            return "redirect:" + app.failure
+            return "redirect:" + client.failure
         }
 
         val user = users.findOrCreate(account)
 
-        val expiresIn = when (accessToken) {
-            is OAuth2AccessToken -> accessToken.expiresIn!!
-            is OAuth1AccessToken -> 6000
-            else -> 6000
+        val tokenExpiresIn: Long? = when (accessToken) {
+            is OAuth2AccessToken -> accessToken.expiresIn?.toLong()
+            is OAuth1AccessToken -> null
+            else -> null
         }
+
+        val expiresIn = client.expiresIn ?: tokenExpiresIn ?: 6000
 
         val key = app.key
         val jws = Jwts.builder()
@@ -102,7 +103,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
                 .claim("image", user.profileImageURL)
                 .claim("scope", user.roles[clientId])
                 .signWith(app.algorithm, key)
-                .setExpiration(Date.from(Instant.now().plusSeconds(expiresIn.toLong())))
+                .setExpiration(Date.from(Instant.now().plusSeconds(expiresIn)))
                 .compact()
 
         val code = tokens.put(jws)
@@ -112,7 +113,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
             redirectTo = request.redirect_uri + "?code=$code"
             if (!request.state.isNullOrBlank()) redirectTo += "&state=${request.state}"
         } else {
-            redirectTo = app.success
+            redirectTo = client.success
                     .replace("[token]", jws)
                     .replace("[code]", code)
                     .replace("[state]", request.state ?: "")

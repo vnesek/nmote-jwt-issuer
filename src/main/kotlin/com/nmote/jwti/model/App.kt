@@ -20,15 +20,26 @@ import java.security.Key
 import java.util.*
 import javax.crypto.spec.SecretKeySpec
 
-class App {
+class Client {
 
-    var audience: String? = null
+    var expiresIn: Long? = null
+
+    var clientId: String = ""
+
+    var clientSecret: String = ""
 
     var success: String = "/login-success"
 
     var failure: String = "/login-failure"
+}
 
-    var secret: String = "HS512:EcP5P36prfRfYhUrRfwpI01sigj2bU8b2N1d+9hycRfszlfQyVmcmh2QiPNIIfAqEdBGUkEN1qRqzYqSVoKxfQ=="
+class App {
+
+    var clients: MutableMap<String, Client> = mutableMapOf()
+
+    var audience: String? = null
+
+    var secret: String = ""
 
     val key: Key
         get() {

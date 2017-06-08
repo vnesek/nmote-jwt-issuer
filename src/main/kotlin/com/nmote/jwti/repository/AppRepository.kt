@@ -23,10 +23,10 @@ interface AppRepository {
 
     val url: String?
 
-    operator fun get(appId: String): App?
+    operator fun get(clientId: String): Pair<App, Client>?
 }
 
-//@ConditionalOnProperty("issuer.applications")
+//@ConditionalOnProperty(prefix="issuer.applications",)
 @Component
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "issuer")
@@ -34,7 +34,14 @@ class DefaultAppRepository : AppRepository {
 
     override var url: String? = null
 
-    override fun get(appId: String): App? = applications[appId]
+    override fun get(clientId: String): Pair<App, Client>? {
+        for (app in applications.values) {
+            for (client in app.clients.values) {
+                if (client.clientId == clientId) return Pair(app, client)
+            }
+        }
+        return null
+    }
 
     var applications: MutableMap<String, App> = mutableMapOf()
 }

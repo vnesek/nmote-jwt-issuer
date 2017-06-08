@@ -35,9 +35,16 @@ issuer:
 
   applications:
     demo0:
-      audience: https://translator.photomath.net
+      audience: https://jwti.nmote.com
       secret: HS256:r3LG69+9J4dOT0AbG5bMwPLFVPGm19tnsWX2ia61ZPo=
-      success: http://localhost:8080/demo0
-    demo1:
-      secret: HS256:Jc4BSD2rzAH4pnzCHt4qscAGzhaIFlcOGdjhhM8JaKk=
-      success: http://localhost:8080/demo1
+      clients:
+        postman:
+          expires-in: 7200
+          client-id: postman
+          client-secret: ignored
+          success: https://www.getpostman.com/oauth2/callback?code=[code]&state=[state]
+        web:
+          expires-in: 300
+          client-id: demo
+          client-secret: ignored
+          success: http://localhost:8000/authorized#[token]
