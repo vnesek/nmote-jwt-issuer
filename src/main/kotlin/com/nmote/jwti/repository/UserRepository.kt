@@ -22,9 +22,15 @@ import com.nmote.jwti.model.User
 
 interface UserRepository {
 
+    fun delete(user: Iterable<User>)
+
+    fun findOne(id : String): User?
+
     fun save(user: User): User
 
     fun findBySocialAccount(accountId: String, socialService: String): User?
+
+    fun findAll(): Collection<User>
 }
 
 fun UserRepository.findOrCreate(account: SocialAccount<*>): User {

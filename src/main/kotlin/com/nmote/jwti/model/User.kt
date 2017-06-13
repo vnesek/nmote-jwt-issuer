@@ -16,6 +16,7 @@
 package com.nmote.jwti.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.hibernate.validator.constraints.Email
 import org.springframework.data.annotation.Id
@@ -24,6 +25,18 @@ import org.springframework.data.mongodb.core.mapping.Field
 import java.io.Serializable
 import java.time.Instant
 import java.util.*
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class UserData(
+        val id: String,
+        val type: String,
+        val name: String? = null,
+        val email: String? = null,
+        val imageURL: String? = null,
+        val roles: Map<String, Set<String>>? = null,
+        val accounts: List<UserData>? = null)
+
+
 
 class User : SocialAccount<JwtiAccessToken>, Serializable {
 
@@ -84,4 +97,21 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
         this[account]?.let { this.accounts -= it }
         return this
     }
+
+    fun merge(user: User) {
+        accounts += user.accounts
+        val r = roles.toMutableMap()
+        for ((app, roles) in user.roles) {
+            r.merge(app, roles, { u, v -> u + v })
+        }
+    }
+
+    override  fun toUserData() = UserData(
+            id = accountId,
+            type = socialService,
+            name = profileName,
+            email = profileEmail,
+            imageURL = profileImageURL,
+            roles = roles,
+            accounts = accounts.map(SocialAccount<*>::toUserData))
 }

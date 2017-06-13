@@ -32,4 +32,11 @@ interface SocialAccount<out T> : Serializable {
     val socialService: String
 
     val accessToken: T?
+
+    fun toUserData() = UserData(
+            id = accountId,
+            type = socialService,
+            name = profileName,
+            email = profileEmail,
+            imageURL = profileImageURL)
 }

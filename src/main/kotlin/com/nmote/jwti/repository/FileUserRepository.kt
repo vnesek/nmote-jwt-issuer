@@ -40,6 +40,22 @@ class FileUserRepository @Autowired constructor(
         val mapper: ObjectMapper
 ) : UserRepository {
 
+    override fun delete(usersToDelete: Iterable<User>) {
+        synchronized(this) {
+            refresh()
+            val toDelete = usersToDelete.map(User::accountId).toSet()
+            users.removeIf { toDelete.contains(it.accountId) }
+            saveUsers()
+        }
+    }
+
+    override fun findOne(id: String): User? = synchronized(this) {
+        refresh()
+        return users.find { it.accountId == id }
+    }
+
+    override fun findAll(): Collection<User> = users;
+
     private val log = LoggerFactory.getLogger(javaClass)
 
     var lastModified: FileTime = getLastModifiedFileTime()
@@ -52,11 +68,9 @@ class FileUserRepository @Autowired constructor(
         FileTime.from(Instant.now())
     }
 
-    override fun findBySocialAccount(accountId: String, socialService: String): User? {
-        synchronized(this) {
-            refresh()
-            return users.filter { it[accountId, socialService] != null }.firstOrNull()
-        }
+    override fun findBySocialAccount(accountId: String, socialService: String): User? = synchronized(this) {
+        refresh()
+        return users.filter { it[accountId, socialService] != null }.firstOrNull()
     }
 
     private operator fun get(account: SocialAccount<*>): User?
@@ -65,28 +79,31 @@ class FileUserRepository @Autowired constructor(
     private operator fun get(id: String): User?
             = users.filter { it.accountId == id }.firstOrNull()
 
-    fun refresh() {
-        synchronized(this) {
-            if (lastModified.toInstant().isBefore(Instant.now().plusSeconds(15))) {
-                try {
-                    val lm = getLastModifiedFileTime()
-                    if (lastModified < lm) {
-                        users = loadUsers()
-                        lastModified = lm
-                        // log.debug("Reloaded {} users from {}", users.size, usersFile)
-                    }
-                } catch (ioe: IOException) {
-                    log.error("Failed to read {}", usersFile, ioe)
+    fun refresh() = synchronized(this) {
+        if (lastModified.toInstant().isBefore(Instant.now().plusSeconds(15))) {
+            try {
+                val lm = getLastModifiedFileTime()
+                if (lastModified < lm) {
+                    users = loadUsers()
+                    lastModified = lm
+                    // log.debug("Reloaded {} users from {}", users.size, usersFile)
                 }
+            } catch (ioe: IOException) {
+                log.error("Failed to read {}", usersFile, ioe)
             }
         }
     }
 
-    override fun save(user: User): User {
+    override fun save(user: User): User = synchronized(this) {
+        users.remove(user)
+        users.add(user)
+        saveUsers()
+        user
+    }
+
+    private fun saveUsers() {
         synchronized(this) {
             try {
-                users.remove(user)
-                users.add(user)
                 mapper.writeValue(File(usersFile), users)
                 lastModified = getLastModifiedFileTime()
                 log.debug("Saved {} users to {}", users.size, usersFile)
@@ -94,7 +111,6 @@ class FileUserRepository @Autowired constructor(
                 log.error("Failed to save {}", usersFile)
             }
         }
-        return user
     }
 
     private fun loadUsers(): MutableList<User> {
