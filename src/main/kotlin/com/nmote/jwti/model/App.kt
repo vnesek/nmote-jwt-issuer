@@ -18,6 +18,7 @@ package com.nmote.jwti.model
 import io.jsonwebtoken.SignatureAlgorithm
 import java.security.Key
 import java.util.*
+import java.util.regex.Pattern
 import javax.crypto.spec.SecretKeySpec
 
 class Client {
@@ -41,6 +42,8 @@ class App {
 
     var audience: String? = null
 
+    var roles: Map<String, Pattern> = mutableMapOf()
+
     var secret: String = ""
 
     val key: Key
@@ -53,4 +56,16 @@ class App {
 
     val algorithm: SignatureAlgorithm
         get() = SignatureAlgorithm.valueOf(secret.substringBefore(':'))
+
+    fun rolesFor(email: Iterable<String>) : Set<String> {
+        val result = mutableSetOf<String>()
+        roles.filterValues { it.matchesAny(email) }.mapTo(result, Map.Entry<String, *>::key)
+        return result
+    }
+
+}
+
+private fun Pattern.matchesAny(input: Iterable<String>): Boolean {
+    val matcher = matcher("")
+    return input.find { matcher.reset(it).matches() } != null
 }

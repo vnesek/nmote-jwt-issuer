@@ -90,7 +90,13 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
             else -> null
         }
 
+        // Determine expires
         val expiresIn = client.expiresIn ?: tokenExpiresIn ?: 6000
+
+        // Determine scope
+        val scope = mutableSetOf<String>()
+        user.roles[app.id]?.let { scope += it }
+        scope += app.rolesFor(user.accounts.mapNotNull(SocialAccount<*>::profileEmail))
 
         val key = app.key
         val jws = Jwts.builder()
@@ -101,7 +107,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
                 .claim("email", account.profileEmail ?: user.profileEmail)
                 .claim("name", account.profileName ?: user.profileName)
                 .claim("image", account.profileImageURL ?: user.profileImageURL)
-                .claim("scope", user.roles[app.id])
+                .claim("scope", scope)
                 .signWith(app.algorithm, key)
                 .setExpiration(Date.from(Instant.now().plusSeconds(expiresIn)))
                 .compact()
