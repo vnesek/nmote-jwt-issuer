@@ -38,5 +38,5 @@ interface SocialAccount<out T> : Serializable {
             type = socialService,
             name = profileName,
             email = profileEmail,
-            imageURL = profileImageURL)
+            image = profileImageURL)
 }

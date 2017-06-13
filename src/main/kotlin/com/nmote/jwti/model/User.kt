@@ -32,10 +32,9 @@ data class UserData(
         val type: String,
         val name: String? = null,
         val email: String? = null,
-        val imageURL: String? = null,
+        val image: String? = null,
         val roles: Map<String, Set<String>>? = null,
         val accounts: List<UserData>? = null)
-
 
 
 class User : SocialAccount<JwtiAccessToken>, Serializable {
@@ -106,12 +105,12 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
         }
     }
 
-    override  fun toUserData() = UserData(
+    override fun toUserData() = UserData(
             id = accountId,
             type = socialService,
             name = profileName,
             email = profileEmail,
-            imageURL = profileImageURL,
+            image = profileImageURL,
             roles = roles,
             accounts = accounts.map(SocialAccount<*>::toUserData))
 }

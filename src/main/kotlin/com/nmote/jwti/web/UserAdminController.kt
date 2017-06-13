@@ -27,18 +27,32 @@ import org.springframework.web.bind.annotation.*
 class UserAdminController(val users: UserRepository) {
 
     @RequestMapping(method = arrayOf(RequestMethod.GET))
-    fun all() = users.findAll().map(SocialAccount<*>::toUserData)
+    fun getAll() = users.findAll().map(SocialAccount<*>::toUserData)
 
     @Transactional
     @RequestMapping(value = "merge", method = arrayOf(RequestMethod.POST))
     fun merge(@RequestParam id: List<String>): UserData {
         if (id.size < 2) throw Exception("at least two users required for merge")
-        val u = id.map { users.findOne(it) ?: throw Exception("not found " + it) }
+        val u = id.map(this::getUser)
         val user = u[0]
         val mergees = u.subList(1, u.size)
         mergees.forEach(user::merge)
         users.delete(mergees)
         users.save(user)
         return user.toUserData()
+    }
+
+    private fun getUser(id: String) = users.findOne(id) ?: throw Exception("not found " + id)
+
+    @RequestMapping(value = "{id}/roles", method = arrayOf(RequestMethod.GET))
+    fun getRoles(@PathVariable id: String): Map<String, Set<String>> = getUser(id).roles
+
+    @Transactional
+    @RequestMapping(value = "{id}/roles", method = arrayOf(RequestMethod.PUT))
+    fun setRoles(@PathVariable id: String, @RequestBody roles: Map<String, Set<String>>): Map<String, Set<String>> {
+        val user = getUser(id)
+        user.roles = roles
+        users.save(user)
+        return user.roles
     }
 }

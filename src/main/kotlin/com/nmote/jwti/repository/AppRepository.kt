@@ -18,6 +18,7 @@ package com.nmote.jwti.model
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component
+import javax.annotation.PostConstruct
 
 interface AppRepository {
 
@@ -44,6 +45,12 @@ class DefaultAppRepository : AppRepository {
     }
 
     var applications: MutableMap<String, App> = mutableMapOf()
+
+    @PostConstruct
+    private fun postProcess() {
+        // Set id on apps
+        applications.forEach { id, app -> app.id = id }
+    }
 }
 
 

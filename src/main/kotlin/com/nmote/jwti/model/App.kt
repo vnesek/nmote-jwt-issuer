@@ -35,6 +35,8 @@ class Client {
 
 class App {
 
+    lateinit var id: String
+
     var clients: MutableMap<String, Client> = mutableMapOf()
 
     var audience: String? = null
