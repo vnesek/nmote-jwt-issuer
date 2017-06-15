@@ -106,7 +106,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
                 .setIssuer(apps.url)
                 .claim("email", account.profileEmail ?: user.profileEmail)
                 .claim("name", account.profileName ?: user.profileName)
-                .claim("image", account.profileImageURL ?: user.profileImageURL)
+                .claim("image", (account.profileImageURL ?: user.profileImageURL)?.removePrefix("http:"))
                 .claim("scope", scope)
                 .signWith(app.algorithm, key)
                 .setExpiration(Date.from(Instant.now().plusSeconds(expiresIn)))
