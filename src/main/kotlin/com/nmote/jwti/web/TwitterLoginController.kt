@@ -67,6 +67,7 @@ class TwitterLoginController(
         service.signRequest(accessToken, request)
         val response = service.execute(request)
         val body = response.body
+        log.info("Response {}", body)
         val account = objectMapper.readValue(body, TwitterAccount::class.java)
         account.accessToken = accessToken
         return account
