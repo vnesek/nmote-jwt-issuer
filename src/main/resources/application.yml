@@ -10,6 +10,7 @@ logging:
   config: classpath:logback.xml
 
 issuer:
+  secret: HS256:Jc4BSD2rzAH4pnzCHt4qscAGzhaIFlcOGdjhhM8JaKk=
   repository:
     file: false
     mongo: false
@@ -37,6 +38,8 @@ issuer:
     demo0:
       audience: https://jwti.nmote.com
       secret: HS256:r3LG69+9J4dOT0AbG5bMwPLFVPGm19tnsWX2ia61ZPo=
+      roles:
+        "issuer:admin": "vnesek@.*"
       clients:
         postman:
           expires-in: 7200

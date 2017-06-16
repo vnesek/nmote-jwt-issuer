@@ -18,20 +18,25 @@ package com.nmote.jwti.web
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.UserData
 import com.nmote.jwti.repository.UserRepository
+import com.nmote.jwti.service.JwtAuthenticationService
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/users")
 @CrossOrigin
 @RestController
-class UserAdminController(val users: UserRepository) {
+class UserAdminController(val users: UserRepository, val auth: JwtAuthenticationService) {
 
     @RequestMapping(method = arrayOf(RequestMethod.GET))
-    fun getAll() = users.findAll().map(SocialAccount<*>::toUserData)
+    fun getAll(): List<UserData> {
+        auth.hasScope("issuer:admin")
+        return users.findAll().map(SocialAccount<*>::toUserData)
+    }
 
     @Transactional
     @RequestMapping(value = "merge", method = arrayOf(RequestMethod.POST))
     fun merge(@RequestParam id: List<String>): UserData {
+        auth.hasScope("issuer:admin")
         if (id.size < 2) throw Exception("at least two users required for merge")
         val u = id.map(this::getUser)
         val user = u[0]
@@ -45,11 +50,15 @@ class UserAdminController(val users: UserRepository) {
     private fun getUser(id: String) = users.findOne(id) ?: throw Exception("not found " + id)
 
     @RequestMapping(value = "{id}/roles", method = arrayOf(RequestMethod.GET))
-    fun getRoles(@PathVariable id: String): Map<String, Set<String>> = getUser(id).roles
+    fun getRoles(@PathVariable id: String): Map<String, Set<String>> {
+        auth.hasScope("issuer:admin")
+        return getUser(id).roles
+    }
 
     @Transactional
     @RequestMapping(value = "{id}/roles", method = arrayOf(RequestMethod.PUT))
     fun setRoles(@PathVariable id: String, @RequestBody roles: Map<String, Set<String>>): Map<String, Set<String>> {
+        auth.hasScope("issuer:admin")
         val user = getUser(id)
         user.roles = roles
         users.save(user)
