@@ -38,12 +38,12 @@ class DefaultScopeService : ScopeService {
     override fun scopeFor(account: SocialAccount<*>, app: App, requestedScopes: Set<String>): Set<String> {
         val scope = mutableSetOf<String>()
         if (account is User) {
-            val userRoles = account.roles[app.id]
+            val appRoles = account.roles[app.id]
             val emails = account.accounts.mapNotNull(SocialAccount<*>::profileEmail)
-            val implicit = app.rolesFor(emails)
-            log.debug("App roles for {} => {}. Implicit roles for {} => {}", app.id, userRoles, emails, implicit)
-            if (userRoles != null) scope += userRoles
-            scope += implicit
+            val implicitRoles = app.rolesFor(emails)
+            log.debug("Roles for {} => {}. Implicit roles for {} => {}", app.id, appRoles, emails, implicitRoles)
+            if (appRoles != null) scope += appRoles
+            scope += implicitRoles
         } else {
             val email = account.profileEmail
             if (email != null) scope += app.rolesFor(setOf(email))
