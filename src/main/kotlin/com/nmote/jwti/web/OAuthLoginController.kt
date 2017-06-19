@@ -98,14 +98,17 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
         // Determine scope
         val scope = scopes.scopeFor(user, app)
 
+        val name = account.profileName ?: user.profileName
+        val email = account.profileEmail ?: user.profileEmail
+
         val key = app.key
         val jws = Jwts.builder()
                 .setAudience(app.audience)
                 .setSubject(user.accountId)
                 .setIssuedAt(Date())
                 .setIssuer(apps.url)
-                .claim("email", account.profileEmail ?: user.profileEmail)
-                .claim("name", account.profileName ?: user.profileName)
+                .claim("email", email)
+                .claim("name", name)
                 .claim("image", (account.profileImageURL ?: user.profileImageURL)?.removePrefix("http:"))
                 .claim("scope", scope)
                 .signWith(app.algorithm, key)
@@ -113,6 +116,8 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
                 .compact()
 
         val code = tokens.put(jws)
+
+        log.info("Issued access token to {} scope {}", name, scope)
 
         var redirectTo: String
         if (!request.redirect_uri.isNullOrBlank()) {
