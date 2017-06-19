@@ -18,6 +18,7 @@ package com.nmote.jwti.service
 import com.nmote.jwti.model.App
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.User
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 
@@ -32,12 +33,17 @@ interface ScopeService {
 @Service
 class DefaultScopeService : ScopeService {
 
+    private val log = LoggerFactory.getLogger(javaClass)
+
     override fun scopeFor(account: SocialAccount<*>, app: App, requestedScopes: Set<String>): Set<String> {
         val scope = mutableSetOf<String>()
         if (account is User) {
             val userRoles = account.roles[app.id]
+            val emails = account.accounts.mapNotNull(SocialAccount<*>::profileEmail)
+            val implicit = app.rolesFor(emails)
+            log.debug("App roles for {} => {}. Implicit roles for {} => {}", app.id, userRoles, emails, implicit)
             if (userRoles != null) scope += userRoles
-            scope += app.rolesFor(account.accounts.mapNotNull(SocialAccount<*>::profileEmail))
+            scope += implicit
         } else {
             val email = account.profileEmail
             if (email != null) scope += app.rolesFor(setOf(email))

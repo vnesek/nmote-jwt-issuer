@@ -117,7 +117,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
 
         val code = tokens.put(jws)
 
-        log.info("Issued access token to {} scope {}", name, scope)
+        log.info("Issued access token for {} to {} scope {}", app.id, name, scope)
 
         var redirectTo: String
         if (!request.redirect_uri.isNullOrBlank()) {
