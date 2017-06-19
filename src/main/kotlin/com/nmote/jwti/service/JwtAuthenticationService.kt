@@ -15,10 +15,8 @@
 
 package com.nmote.jwti.service
 
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jws
-import io.jsonwebtoken.JwtException
-import io.jsonwebtoken.JwtParser
+import com.nmote.jwti.model.AppRepository
+import io.jsonwebtoken.*
 import org.springframework.context.annotation.Scope
 import org.springframework.context.annotation.ScopedProxyMode
 import org.springframework.http.HttpStatus
@@ -32,10 +30,18 @@ class TokenMissingException : JwtException("Need Authorization Bearer in HTTP re
 @ResponseStatus(HttpStatus.FORBIDDEN)
 class NotAuthorizedException(scope: String) : JwtException(scope)
 
+@ResponseStatus(HttpStatus.NOT_FOUND)
+class AppNotFoundException(audience: String) : JwtException(audience)
+
 interface JwtAuthenticationService {
+
     val subject: String?
+
     val scope: List<String>
+
     val authentication: Jws<Claims>
+
+    val audience: String
 
     fun hasScope(required: String) {
         if (!scope.contains(required)) throw NotAuthorizedException(required)
@@ -49,28 +55,53 @@ interface JwtAuthenticationService {
 
 @Service
 @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
-class DefaultJwtAuthenticationService(val request: HttpServletRequest, val jwtParser: JwtParser) : JwtAuthenticationService {
+class DefaultJwtAuthenticationService(val request: HttpServletRequest, val apps: AppRepository) : JwtAuthenticationService {
 
-    override val subject: String? get() = authentication.body.subject
+    private val parser = Jwts.parser()
+
+    override val subject: String?
+        get() = authentication.body.subject
 
     override val authentication: Jws<Claims> get() {
         @Suppress("UNCHECKED_CAST")
         var jws = request.getAttribute(tokenKey) as? Jws<Claims>
         if (jws == null) {
             val token = request.getBearerToken() ?: throw TokenMissingException()
-            jws = jwtParser.parseClaimsJws(token) ?: throw NullPointerException("jwt parser returned null instead od Jws<Claims>")
+            jws = getJws(token)
             request.setAttribute(tokenKey, jws)
         }
         return jws
     }
 
+    private fun getJws(token: String): Jws<Claims> {
+        // Get audience from token
+        val jwt = parser.parseClaimsJwtIgnoreSignature(token)
+        val audience = jwt.body.audience
+        return getJws(token, audience)
+    }
+
+    private fun getJws(token: String, audience: String): Jws<Claims> {
+        val app = apps.findByAudience(audience) ?: throw AppNotFoundException(audience)
+        return app.parser.parseClaimsJws(token)
+    }
+
     @Suppress("UNCHECKED_CAST")
-    override val scope: List<String> get() = authentication.body["scope"] as? List<String> ?: emptyList()
+    override val scope: List<String>
+        get() = authentication.body["scope"] as? List<String> ?: emptyList()
+
+    override val audience: String
+        get() = authentication.body.audience
+}
+
+private fun JwtParser.parseClaimsJwtIgnoreSignature(token: String): Jwt<Header<*>, Claims> {
+    val lastDot = token.lastIndexOf('.')
+    val tokenWithoutSignature = token.substring(0, lastDot + 1)
+    return parseClaimsJwt(tokenWithoutSignature)
 }
 
 private val tokenKey = "com.nmote.jwti.token"
 
-fun String.bearerToken(): String? {
+private fun String.bearerToken(): String? {
     val space = indexOf(' ')
     if (space != -1) {
         if ("bearer".equals(substring(0, space), ignoreCase = true)) {
@@ -80,5 +111,5 @@ fun String.bearerToken(): String? {
     return null
 }
 
-fun HttpServletRequest.getBearerToken(): String? = getHeader("Authorization")?.bearerToken()
+private fun HttpServletRequest.getBearerToken(): String? = getHeader("Authorization")?.bearerToken()
 

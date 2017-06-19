@@ -25,6 +25,7 @@ import com.nmote.jwti.model.AppRepository
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.TwitterAccount
 import com.nmote.jwti.repository.UserRepository
+import com.nmote.jwti.service.ScopeService
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.stereotype.Controller
@@ -41,8 +42,9 @@ class TwitterLoginController(
         objectMapper: ObjectMapper,
         users: UserRepository,
         apps: AppRepository,
-        tokens: TokenCache
-) : OAuthLoginController<OAuth10aService, OAuth1AccessToken>(service, objectMapper, users, apps, tokens) {
+        tokens: TokenCache,
+        scopes: ScopeService
+) : OAuthLoginController<OAuth10aService, OAuth1AccessToken>(service, objectMapper, users, apps, tokens, scopes) {
 
     @RequestMapping("callback")
     fun callback(
@@ -67,7 +69,6 @@ class TwitterLoginController(
         service.signRequest(accessToken, request)
         val response = service.execute(request)
         val body = response.body
-        log.info("Response {}", body)
         val account = objectMapper.readValue(body, TwitterAccount::class.java)
         account.accessToken = accessToken
         return account

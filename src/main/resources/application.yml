@@ -38,7 +38,7 @@ issuer:
     demo0:
       audience: https://jwti.nmote.com
       secret: HS256:r3LG69+9J4dOT0AbG5bMwPLFVPGm19tnsWX2ia61ZPo=
-      roles:
+      roleForEmail:
         "issuer:admin": "vnesek@.*"
       clients:
         postman:

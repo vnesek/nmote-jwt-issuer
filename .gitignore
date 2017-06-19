@@ -5,7 +5,7 @@
 out/
 photomath.json
 src/main/resources/application-dev.yml
-
+photomath.gradle
 
 ### STS ###
 .apt_generated

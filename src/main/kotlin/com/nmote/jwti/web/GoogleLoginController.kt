@@ -24,6 +24,7 @@ import com.nmote.jwti.model.AppRepository
 import com.nmote.jwti.model.GoogleAccount
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.repository.UserRepository
+import com.nmote.jwti.service.ScopeService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -42,8 +43,9 @@ constructor(
         objectMapper: ObjectMapper,
         users: UserRepository,
         apps: AppRepository,
-        tokens: TokenCache
-) : OAuthLoginController<OAuth20Service, OAuth2AccessToken>(service, objectMapper, users, apps, tokens) {
+        tokens: TokenCache,
+        scopes: ScopeService
+) : OAuthLoginController<OAuth20Service, OAuth2AccessToken>(service, objectMapper, users, apps, tokens, scopes) {
 
     @RequestMapping("callback")
     fun callback(

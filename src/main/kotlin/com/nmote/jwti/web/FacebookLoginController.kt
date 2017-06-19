@@ -21,6 +21,7 @@ import com.github.scribejava.core.oauth.OAuth20Service
 import com.nmote.jwti.model.AppRepository
 import com.nmote.jwti.model.FacebookAccount
 import com.nmote.jwti.repository.UserRepository
+import com.nmote.jwti.service.ScopeService
 import com.restfb.DefaultFacebookClient
 import com.restfb.Parameter
 import com.restfb.Version
@@ -42,8 +43,9 @@ class FacebookLoginController(
         users: UserRepository,
         apps: AppRepository,
         tokens: TokenCache,
+        scopes: ScopeService,
         @Value("\${issuer.facebook.secret}") val appSecret: String
-) : OAuthLoginController<OAuth20Service, OAuth2AccessToken>(service, objectMapper, users, apps, tokens) {
+) : OAuthLoginController<OAuth20Service, OAuth2AccessToken>(service, objectMapper, users, apps, tokens, scopes) {
 
     @RequestMapping("callback")
     fun callback(

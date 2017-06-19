@@ -15,6 +15,9 @@
 
 package com.nmote.jwti.model
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import io.jsonwebtoken.JwtParser
+import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import java.security.Key
 import java.util.*
@@ -25,14 +28,21 @@ class Client {
 
     var expiresIn: Long? = null
 
-    var clientId: String = ""
+    lateinit var clientId: String
 
-    var clientSecret: String = ""
+    lateinit var clientSecret: String
 
     var success: String = "/login-success"
 
     var failure: String = "/login-failure"
 }
+
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class AppData(
+        val id: String,
+        val audience: String?,
+        val roles: Set<String>)
 
 class App {
 
@@ -40,29 +50,34 @@ class App {
 
     var clients: MutableMap<String, Client> = mutableMapOf()
 
-    var audience: String? = null
+    lateinit var audience: String
 
-    var roles: Map<String, Pattern> = mutableMapOf()
+    var roleForEmail: Map<String, Pattern> = mutableMapOf()
 
-    var secret: String = ""
+    lateinit var secret: String
 
-    val key: Key
-        get() {
-            val (id, encoded) = secret.split(':', limit = 2)
-            val algorithm = SignatureAlgorithm.valueOf(id)
-            val decoded = Base64.getDecoder().decode(encoded)
-            return SecretKeySpec(decoded, algorithm.jcaName)
-        }
+    val roles: Set<String> get() = roleForEmail.keys
 
-    val algorithm: SignatureAlgorithm
-        get() = SignatureAlgorithm.valueOf(secret.substringBefore(':'))
+    val key: Key by lazy {
+        val (id, encoded) = secret.split(':', limit = 2)
+        val algorithm = SignatureAlgorithm.valueOf(id)
+        val decoded = Base64.getDecoder().decode(encoded)
+        SecretKeySpec(decoded, algorithm.jcaName)
+    }
 
-    fun rolesFor(email: Iterable<String>) : Set<String> {
+    val algorithm: SignatureAlgorithm by lazy {
+        SignatureAlgorithm.valueOf(secret.substringBefore(':'))
+    }
+
+    fun rolesFor(email: Iterable<String>): Set<String> {
         val result = mutableSetOf<String>()
-        roles.filterValues { it.matchesAny(email) }.mapTo(result, Map.Entry<String, *>::key)
+        roleForEmail.filterValues { it.matchesAny(email) }.mapTo(result, Map.Entry<String, *>::key)
         return result
     }
 
+    val parser: JwtParser by lazy { Jwts.parser().setSigningKey(key) }
+
+    fun toAppData() = AppData(id, audience, roles)
 }
 
 private fun Pattern.matchesAny(input: Iterable<String>): Boolean {

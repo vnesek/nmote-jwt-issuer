@@ -5,7 +5,7 @@ JWT token issuer with delegated authentification (google, facebook, twitter)
 - refresh tokens
 - correct OAuth2 fragment parameter passing
 - disable users
-- API for add/delete/list roles for users
+- API for add/delete/list roleForEmail for users
 - mongo based AppRepository
 - JPA based repositories
 - password based auth for users

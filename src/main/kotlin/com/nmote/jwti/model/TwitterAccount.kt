@@ -46,7 +46,9 @@ class TwitterAccount : SocialAccount<OAuth1AccessToken>, Serializable {
 
     @get:Transient
     @JsonProperty("name")
-    override val profileName: String? = null
+    val name: String? = null
+
+    override val profileName: String? get() = name ?: screenName
 
     @get:Transient
     @JsonProperty("profile_image_url")

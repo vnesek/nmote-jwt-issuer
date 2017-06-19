@@ -33,7 +33,8 @@ data class UserData(
         val name: String? = null,
         val email: String? = null,
         val image: String? = null,
-        val roles: Map<String, Set<String>>? = null,
+        val roles: Set<String>? = null,
+        val scope: Set<String>? = null,
         val accounts: List<UserData>? = null)
 
 
@@ -71,7 +72,7 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
 
     var password: String = "not-set"
 
-    var roles: Map<String, Set<String>> = emptyMap()
+    var roles: MutableMap<String, Set<String>> = mutableMapOf()
 
     var accounts: List<BasicSocialAccount> = emptyList()
 
@@ -104,13 +105,4 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
             r.merge(app, roles, { u, v -> u + v })
         }
     }
-
-    override fun toUserData() = UserData(
-            id = accountId,
-            type = socialService,
-            name = profileName,
-            email = profileEmail,
-            image = profileImageURL,
-            roles = roles,
-            accounts = accounts.map(SocialAccount<*>::toUserData))
 }

@@ -24,6 +24,7 @@ import com.nmote.jwti.model.AppRepository
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.repository.UserRepository
 import com.nmote.jwti.repository.findOrCreate
+import com.nmote.jwti.service.ScopeService
 import io.jsonwebtoken.Jwts
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.RequestMapping
@@ -38,7 +39,8 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
         protected val objectMapper: ObjectMapper,
         protected val users: UserRepository,
         protected val apps: AppRepository,
-        protected val tokens: TokenCache
+        protected val tokens: TokenCache,
+        protected val scopes: ScopeService
 ) {
 
     // TODO Filter scopes based on auth request
@@ -94,9 +96,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
         val expiresIn = client.expiresIn ?: tokenExpiresIn ?: 6000
 
         // Determine scope
-        val scope = mutableSetOf<String>()
-        user.roles[app.id]?.let { scope += it }
-        scope += app.rolesFor(user.accounts.mapNotNull(SocialAccount<*>::profileEmail))
+        val scope = scopes.scopeFor(user, app)
 
         val key = app.key
         val jws = Jwts.builder()

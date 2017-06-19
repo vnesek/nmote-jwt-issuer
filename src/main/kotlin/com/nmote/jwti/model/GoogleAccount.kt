@@ -91,9 +91,9 @@ class GoogleAccount : SocialAccount<OAuth2AccessToken>, Serializable {
                     result = b.toString()
                 }
             }
-            if (result == null) {
-                result = profileEmail
-            }
+            //if (result == null) {
+                //result = profileEmail
+            //}
             return result
         }
 

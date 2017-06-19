@@ -25,6 +25,10 @@ interface AppRepository {
     val url: String?
 
     operator fun get(clientId: String): Pair<App, Client>?
+
+    fun findAll(): Iterable<App>
+
+    fun findByAudience(audience: String): App?
 }
 
 //@ConditionalOnProperty(prefix="issuer.applications",)
@@ -32,6 +36,14 @@ interface AppRepository {
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "issuer")
 class DefaultAppRepository : AppRepository {
+
+    override fun findByAudience(audience: String): App? {
+        val app = applications.values.find { it.audience == audience }
+        return app
+    }
+
+    override fun findAll(): Iterable<App>
+            = applications.values
 
     override var url: String? = null
 
@@ -48,9 +60,10 @@ class DefaultAppRepository : AppRepository {
 
     @PostConstruct
     private fun postProcess() {
-        // Set id on apps
+        // Reverse link id on app instances
         applications.forEach { id, app -> app.id = id }
     }
 }
+
 
 
