@@ -40,6 +40,28 @@ class AdminController(
         private val scopes: ScopeService
 ) {
 
+    @RequestMapping(value = "health", method = arrayOf(RequestMethod.GET))
+    fun health() : Map<String, Boolean> {
+        val usersOk = try {
+            users.findOne("ignored")
+            true
+        } catch (e: Throwable) {
+            false
+        }
+        val appsOk = try {
+            apps["ignored"]
+            true
+        } catch (e: Throwable) {
+            false
+        }
+        return mapOf(
+                "users" to usersOk,
+                "apps" to appsOk,
+                "running" to (usersOk && appsOk)
+        )
+    }
+
+
     @RequestMapping(value = "config", method = arrayOf(RequestMethod.GET))
     fun getConfig(): ConfigData {
         auth.hasScope("issuer:admin")
