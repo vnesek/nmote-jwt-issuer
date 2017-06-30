@@ -1,11 +1,11 @@
 buildscript {
     ext {
-        kotlinVersion = "1.1.3"
-        springBootVersion = "1.5.4.RELEASE"
-        ningVersion = "1.9.38"
-        restfbVersion = "1.41.0-PC"
-        scribejavaVersion = "4.1.1"
-        ahcVersion = "2.0.30"
+        kotlinVersion = '1.1.3'
+        springBootVersion = '1.5.4.RELEASE'
+        ningVersion = '1.9.38'
+        restfbVersion = '1.41.0-PC'
+        scribejavaVersion = '4.1.1'
+        ahcVersion = '2.0.30'
     }
     repositories {
         mavenCentral()
@@ -18,24 +18,24 @@ buildscript {
 }
 
 plugins {
-    id "com.github.ben-manes.versions" version "0.15.0"
+    id 'com.github.ben-manes.versions' version '0.15.0'
 }
 
 
-apply plugin: "kotlin"
-apply plugin: "kotlin-spring"
-apply plugin: "eclipse"
-apply plugin: "org.springframework.boot"
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
 
 sourceCompatibility = 1.8
 description = 'JWT Token Issuer'
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = '1.8'
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = '1.8'
 }
 
 repositories {
@@ -50,16 +50,16 @@ jar {
 }
 
 dependencies {
-    compile "org.springframework.boot:spring-boot-starter-web"
+    compile 'org.springframework.boot:spring-boot-starter-web'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
     compile "com.github.scribejava:scribejava-apis:$scribejavaVersion"
     compile "com.github.scribejava:scribejava-httpclient-ahc:$scribejavaVersion"
     compile "org.asynchttpclient:async-http-client:$ahcVersion"
-    compile "org.springframework.boot:spring-boot-starter-data-mongodb"
+    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
     compile "com.restfb:restfb:$restfbVersion"
-    compile "io.jsonwebtoken:jjwt:0.7.0"
+    compile 'io.jsonwebtoken:jjwt:0.7.0'
 
-    testCompile "org.springframework.boot:spring-boot-starter-test"
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 
 springBoot {
