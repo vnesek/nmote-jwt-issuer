@@ -15,6 +15,8 @@
 
 package com.nmote.jwti.web
 
+import com.nmote.jwti.model.OAuthError
+import com.nmote.jwti.model.OAuthException
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwt
 import io.jsonwebtoken.Jwts
@@ -33,7 +35,8 @@ class TokenController(private val tokens: TokenCache) {
     @RequestMapping("token")
     @ResponseBody
     fun token(request: OAuth2Request): Map<String, *> {
-        val token = tokens.get(request.code ?: throw Exception("missing code parameter")) ?: throw Exception("token not found")
+        val code = request.code ?: throw OAuthException(OAuthError.invalid_grant)
+        val token = tokens.get(code) ?: throw OAuthException(OAuthError.invalid_request)
         val lastDot = token.lastIndexOf('.')
         val jwt: Jwt<*, Claims> = parser.parseClaimsJwt(token.substring(0, lastDot + 1))
         val expiration = Duration.between(Instant.now(), jwt.body.expiration.toInstant())

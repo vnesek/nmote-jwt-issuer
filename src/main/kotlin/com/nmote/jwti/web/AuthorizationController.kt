@@ -15,10 +15,7 @@
 
 package com.nmote.jwti.web
 
-import com.nmote.jwti.model.App
-import com.nmote.jwti.model.AppRepository
-import com.nmote.jwti.model.Client
-import com.nmote.jwti.model.User
+import com.nmote.jwti.model.*
 import com.nmote.jwti.repository.UserRepository
 import com.nmote.jwti.service.ScopeService
 import org.springframework.stereotype.Controller
@@ -45,9 +42,9 @@ class AuthorizationController(
 
     fun authorizeClient(request: OAuth2Request, authorization: String?): Pair<App, Client> {
         authorization?.basicAuthorization()?.let { request.client_id = it.first; request.client_secret = it.second }
-        val clientId = request.client_id ?: throw Exception("missing client_id")
-        val (app, client) = apps[clientId] ?: throw Exception("application not found")
-        if (client.clientSecret != request.client_secret) throw Exception("wrong password")
+        val clientId = request.client_id ?: throw OAuthException(OAuthError.invalid_request)
+        val (app, client) = apps[clientId] ?: throw OAuthException(OAuthError.invalid_request)
+        if (client.clientSecret != request.client_secret) throw OAuthException(OAuthError.invalid_grant)
         return Pair(app, client)
     }
 
@@ -55,10 +52,9 @@ class AuthorizationController(
     @ResponseBody
     fun resourceOwnerPasswordCredentials(request: OAuth2Request, @RequestHeader(value = "Authorization", required = false) authorization: String?): Map<String, *> {
         val (app, client) = authorizeClient(request, authorization)
-
-        val user = users.findByUsername(request.username ?: throw Exception("invalid username or password")) ?: throw Exception("invalid username or password")
-
-        if (user.password != request.password) throw Exception("invalid username or password")
+        val username = request.username ?: throw OAuthException(OAuthError.invalid_request)
+        val user = users.findByUsername(username) ?: throw OAuthException(OAuthError.invalid_grant)
+        if (user.password != request.password) throw OAuthException(OAuthError.invalid_grant)
 
         // Determine expires
         val expiresIn = client.expiresIn ?: 6000
