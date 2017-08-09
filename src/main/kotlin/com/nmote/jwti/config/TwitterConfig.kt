@@ -31,8 +31,7 @@ class TwitterConfig {
             @Value("\${issuer.twitter.id}") appId: String,
             @Value("\${issuer.twitter.secret}") appSecret: String,
             @Value("\${issuer.twitter.callback}") callbackURI: String
-    ) = ServiceBuilder()
-            .apiKey(appId)
+    ) = ServiceBuilder(appId)
             .apiSecret(appSecret)
             .callback(callbackURI)
             .build(TwitterApi.Authenticate.instance())

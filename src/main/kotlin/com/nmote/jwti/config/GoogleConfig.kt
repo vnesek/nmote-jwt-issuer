@@ -32,8 +32,7 @@ class GoogleConfig {
             @Value("\${issuer.google.scope}") appScope: String,
             @Value("\${issuer.google.secret}") appSecret: String,
             @Value("\${issuer.google.callback}") callbackURI: String
-    ) = ServiceBuilder()
-            .apiKey(appId)
+    ) = ServiceBuilder(appId)
             .apiSecret(appSecret)
             .scope(appScope)
             .callback(callbackURI)

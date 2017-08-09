@@ -43,7 +43,6 @@ class TokenController(private val tokens: TokenCache) {
                 "expires_in" to expiration.seconds,
                 "token_type" to "bearer",
                 "scope" to scope
-
         )
     }
 }

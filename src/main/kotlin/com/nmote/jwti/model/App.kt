@@ -25,16 +25,12 @@ import java.util.regex.Pattern
 import javax.crypto.spec.SecretKeySpec
 
 class Client {
-
     var expiresIn: Long? = null
-
     lateinit var clientId: String
-
     lateinit var clientSecret: String
-
     var success: String = "/login-success"
-
     var failure: String = "/login-failure"
+    var roles: Set<String> = emptySet()
 }
 
 

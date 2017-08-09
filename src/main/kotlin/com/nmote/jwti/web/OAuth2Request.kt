@@ -49,5 +49,9 @@ data class OAuth2Request(
 
         var client_secret: String? = null,
 
-        var code: String? = null
+        var code: String? = null,
+
+        var username: String? = null,
+
+        var password: String? = null
 )

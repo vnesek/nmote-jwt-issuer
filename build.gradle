@@ -1,10 +1,10 @@
 buildscript {
     ext {
-        kotlinVersion = '1.1.3'
-        springBootVersion = '1.5.4.RELEASE'
+        kotlinVersion = '1.1.3-2'
+        springBootVersion = '1.5.6.RELEASE'
         ningVersion = '1.9.38'
         restfbVersion = '1.41.0-PC'
-        scribejavaVersion = '4.1.1'
+        scribejavaVersion = '4.2.0'
         ahcVersion = '2.0.30'
     }
     repositories {

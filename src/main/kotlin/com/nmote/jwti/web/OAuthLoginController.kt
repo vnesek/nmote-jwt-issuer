@@ -20,8 +20,10 @@ import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth2AccessToken
 import com.github.scribejava.core.model.Token
 import com.github.scribejava.core.oauth.OAuthService
+import com.nmote.jwti.model.App
 import com.nmote.jwti.model.AppRepository
 import com.nmote.jwti.model.SocialAccount
+import com.nmote.jwti.model.User
 import com.nmote.jwti.repository.UserRepository
 import com.nmote.jwti.repository.findOrCreate
 import com.nmote.jwti.service.ScopeService
@@ -75,10 +77,8 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
         val clientId = request.client_id ?: return "redirect:/missing-client-id"
         val (app, client) = apps[clientId] ?: return "redirect:/unknown-application"
 
-        val account: SocialAccount<T>
-        try {
-            account = getSocialAccount(accessToken)
-            // log.debug("Personal information {}", account)
+        val account: SocialAccount<T> = try {
+            getSocialAccount(accessToken)
         } catch (e: Exception) {
             log.error("Login failed {}", accessToken, e)
             return "redirect:" + client.failure
@@ -92,32 +92,17 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
             else -> null
         }
 
-        // Determine expires
-        val expiresIn = client.expiresIn ?: tokenExpiresIn ?: 6000
-
-        // Determine scope
-        val scope = scopes.scopeFor(user, app)
-
-        val name = account.profileName ?: user.profileName
-        val email = account.profileEmail ?: user.profileEmail
-
-        val key = app.key
-        val jws = Jwts.builder()
-                .setAudience(app.audience)
-                .setSubject(user.accountId)
-                .setIssuedAt(Date())
-                .setIssuer(apps.url)
-                .claim("email", email)
-                .claim("name", name)
-                .claim("image", (account.profileImageURL ?: user.profileImageURL)?.removePrefix("http:"))
-                .claim("scope", scope)
-                .signWith(app.algorithm, key)
-                .setExpiration(Date.from(Instant.now().plusSeconds(expiresIn)))
-                .compact()
+        val jws = issueToken(
+                user,
+                app,
+                scopes.scopeFor(user, app),
+                apps.url,
+                account.profileEmail,
+                account.profileName,
+                account.profileImageURL,
+                client.expiresIn ?: tokenExpiresIn ?: 6000)
 
         val code = tokens.put(jws)
-
-        log.debug("Issued access token for {} to {} scope {}", app.id, name, scope)
 
         var redirectTo: String
         if (!request.redirect_uri.isNullOrBlank()) {
@@ -138,5 +123,32 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
     protected abstract fun getSocialAccount(accessToken: T): SocialAccount<T>
 
     protected val log = LoggerFactory.getLogger(javaClass)!!
-
 }
+
+fun issueToken(
+        user: User,
+        app: App,
+        scope: Set<String>,
+        appsUrl: String? = null,
+        email: String? = null,
+        name: String? = null,
+        imageURL: String? = null,
+        expiresIn: Long = 6000
+): String {
+    val jws = Jwts.builder()
+            .setAudience(app.audience)
+            .setSubject(user.username ?: user.accountId)
+            .setIssuedAt(Date())
+            .setIssuer(appsUrl)
+            .claim("email", email ?: user.profileEmail)
+            .claim("name", name ?: user.profileName)
+            .claim("image", (imageURL ?: user.profileImageURL)?.removePrefix("http:"))
+            .claim("scope", scope)
+            .signWith(app.algorithm, app.key)
+            .setExpiration(Date.from(Instant.now().plusSeconds(expiresIn)))
+            .compact()
+    //log.debug("Issued access token for {} to {} scope {}", app.id, name, scope)
+    return jws
+}
+
+

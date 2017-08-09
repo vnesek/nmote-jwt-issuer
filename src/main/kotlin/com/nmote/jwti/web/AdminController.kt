@@ -124,6 +124,7 @@ class AdminController(
 
     private fun User.toUserData(app: App) = UserData(
             id = accountId,
+            username = username,
             type = socialService,
             name = profileName,
             email = profileEmail,

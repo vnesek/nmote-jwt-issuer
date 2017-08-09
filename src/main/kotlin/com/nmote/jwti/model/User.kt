@@ -29,6 +29,7 @@ import java.util.*
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class UserData(
         val id: String,
+        val username: String? = null,
         val type: String,
         val name: String? = null,
         val email: String? = null,
@@ -69,6 +70,8 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
 
     fun <R : Any> firstOrNull(transform: (SocialAccount<*>) -> R?): R?
             = accounts.map(transform).filterNotNull().firstOrNull()
+
+    var username: String? = null
 
     var password: String = "not-set"
 

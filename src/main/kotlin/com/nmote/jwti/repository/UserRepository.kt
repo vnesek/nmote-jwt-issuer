@@ -30,6 +30,8 @@ interface UserRepository {
 
     fun findBySocialAccount(accountId: String, socialService: String): User?
 
+    fun findByUsername(username: String): User?
+
     fun findAll(): Collection<User>
 }
 

@@ -45,9 +45,11 @@ issuer:
           expires-in: 7200
           client-id: postman
           client-secret: ignored
+          roles: "test"
           success: https://www.getpostman.com/oauth2/callback?code=[code]&state=[state]
         web:
           expires-in: 300
           client-id: demo
           client-secret: ignored
+          roles: "test"
           success: http://localhost:8000/authorized#[token]

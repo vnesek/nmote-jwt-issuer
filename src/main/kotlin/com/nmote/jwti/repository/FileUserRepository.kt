@@ -40,6 +40,11 @@ class FileUserRepository @Autowired constructor(
         val mapper: ObjectMapper
 ) : UserRepository {
 
+    override fun findByUsername(username: String): User? {
+        refresh()
+        return users.find { it.username.equals(username, true) }
+    }
+
     override fun delete(usersToDelete: Iterable<User>) {
         synchronized(this) {
             refresh()
