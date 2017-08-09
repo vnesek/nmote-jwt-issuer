@@ -40,8 +40,8 @@ class AdminController(
         private val scopes: ScopeService
 ) {
 
-    @RequestMapping(value = "health", method = arrayOf(RequestMethod.GET))
-    fun health() : Map<String, Boolean> {
+    @GetMapping("health")
+    fun health(): Map<String, Boolean> {
         val usersOk = try {
             users.findOne("ignored")
             true
@@ -61,8 +61,7 @@ class AdminController(
         )
     }
 
-
-    @RequestMapping(value = "config", method = arrayOf(RequestMethod.GET))
+    @GetMapping("config")
     fun getConfig(): ConfigData {
         auth.hasScope("issuer:admin")
         return ConfigData(getApp().toAppData(), getAll())
@@ -70,7 +69,7 @@ class AdminController(
 
     private fun getApp(): App = apps.findByAudience(auth.audience) ?: throw AppNotFoundException(auth.audience)
 
-    @RequestMapping(value = "users/merge", method = arrayOf(RequestMethod.GET))
+    @GetMapping("users")
     fun getAll(): List<UserData> {
         auth.hasScope("issuer:admin")
         val app = getApp()
@@ -78,7 +77,7 @@ class AdminController(
     }
 
     @Transactional
-    @RequestMapping(value = "users/merge", method = arrayOf(RequestMethod.POST))
+    @PostMapping("users/merge")
     fun merge(@RequestParam id: List<String>): UserData {
         auth.hasScope("issuer:admin")
         if (id.size < 2) throw Exception("at least two users required for merge")
@@ -93,7 +92,7 @@ class AdminController(
         return user.toUserData(app)
     }
 
-    @RequestMapping(value = "users/{id}/roles", method = arrayOf(RequestMethod.GET))
+    @GetMapping("users/{id}/roles")
     fun getRoles(@PathVariable id: String): Set<String> {
         auth.hasScope("issuer:admin")
         val app = getApp()
@@ -101,7 +100,7 @@ class AdminController(
     }
 
     @Transactional
-    @RequestMapping(value = "users/{id}/roles", method = arrayOf(RequestMethod.PUT))
+    @PutMapping("users/{id}/roles")
     fun setRoles(@PathVariable id: String, @RequestBody roles: Set<String>): Set<String> {
         auth.hasScope("issuer:admin")
         val app = getApp()
@@ -112,7 +111,7 @@ class AdminController(
     }
 
     @Transactional
-    @RequestMapping(value = "users/{id}", method = arrayOf(RequestMethod.DELETE))
+    @DeleteMapping("users/{id}")
     fun delete(@PathVariable id: String): UserData {
         auth.hasScope("issuer:admin")
         val app = getApp()
@@ -140,5 +139,4 @@ class AdminController(
             email = profileEmail,
             scope = scopes.scopeFor(this, app),
             image = profileImageURL)
-
 }
