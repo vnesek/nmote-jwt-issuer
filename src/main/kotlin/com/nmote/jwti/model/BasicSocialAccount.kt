@@ -24,6 +24,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 import java.io.Serializable
 import java.time.Instant
 
+@Suppress("LeakingThis")
 open class BasicSocialAccount : SocialAccount<JwtiAccessToken>, Serializable {
 
     constructor()

@@ -37,4 +37,3 @@ class JwtiOAuth2AccessToken @JsonCreator @PersistenceConstructor constructor(
         openIdToken = t.openIdToken
     }
 }
-

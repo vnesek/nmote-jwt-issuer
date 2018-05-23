@@ -1,9 +1,9 @@
 buildscript {
     ext {
-        kotlinVersion = '1.2.21'
-        springBootVersion = '1.5.10.RELEASE'
+        kotlinVersion = '1.2.41'
+        springBootVersion = '1.5.13.RELEASE'
         ningVersion = '1.9.38'
-        restfbVersion = '1.41.0-PC'
+        restfbVersion = '2.5.0'
         scribejavaVersion = '4.2.0'
         ahcVersion = '2.0.30'
         jwtVersion = '0.9.0'
@@ -52,7 +52,7 @@ jar {
 
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     compile "com.github.scribejava:scribejava-apis:$scribejavaVersion"
     compile "com.github.scribejava:scribejava-httpclient-ahc:$scribejavaVersion"
     compile "org.asynchttpclient:async-http-client:$ahcVersion"
