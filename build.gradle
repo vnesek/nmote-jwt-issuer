@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        kotlinVersion = '1.2.51'
+        kotlinVersion = '1.2.71'
         springBootVersion = '1.5.13.RELEASE'
         ningVersion = '1.9.38'
         restfbVersion = '2.5.0'
