@@ -68,5 +68,5 @@ constructor(
     }
 
     override val authorizationUrl: String
-        get() = service.getAuthorizationUrl(null)
+        get() = service.authorizationUrl
 }

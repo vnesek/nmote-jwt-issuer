@@ -19,24 +19,25 @@ package com.nmote.jwti.repository
 import com.nmote.jwti.model.BasicSocialAccount
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.User
+import java.util.*
 
 interface UserRepository {
 
-    fun delete(user: Iterable<User>)
+    fun deleteAll(user: Iterable<User>)
 
-    fun findOne(id : String): User?
+    fun findById(id : String): Optional<User>
 
     fun save(user: User): User
 
-    fun findBySocialAccount(accountId: String, socialService: String): User?
+    fun findBySocialAccount(accountId: String, socialService: String): Optional<User>
 
-    fun findByUsername(username: String): User?
+    fun findByUsername(username: String): Optional<User>
 
     fun findAll(): Collection<User>
 }
 
 fun UserRepository.findOrCreate(account: SocialAccount<*>): User {
-    val user = (findBySocialAccount(account.accountId, account.socialService) ?: User())
+    val user = (findBySocialAccount(account.accountId, account.socialService)).orElse(User())
     user.plus(account as? BasicSocialAccount ?: BasicSocialAccount(account))
     return save(user)
 }

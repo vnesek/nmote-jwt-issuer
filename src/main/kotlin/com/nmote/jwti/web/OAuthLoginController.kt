@@ -36,7 +36,7 @@ import java.util.*
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 
-abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protected constructor(
+abstract class OAuthLoginController<out S : OAuthService, T : Token> protected constructor(
         protected val service: S,
         protected val objectMapper: ObjectMapper,
         protected val users: UserRepository,
@@ -59,7 +59,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
         try {
             val authUrl = authorizationUrl
             log.debug("Authorizing {} via {}", clientId, authUrl)
-            return "redirect:" + authUrl
+            return "redirect:$authUrl"
         } catch (ioe: IOException) {
             log.error("Failed to get auth URL", ioe)
             return "redirect:" + client.failure
@@ -68,7 +68,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
 
     protected fun callback(accessToken: T, authState: String, response: HttpServletResponse): String {
         val request = objectMapper.readValue(Base64.getDecoder().decode(authState), OAuth2Request::class.java)
-        log.debug("Received access token {} for {}", accessToken, request.client_id)
+        log.debug("Received access token for {}", request.client_id)
 
         val cookie = Cookie("app", "<deleted>")
         cookie.maxAge = 0
@@ -81,7 +81,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
             getSocialAccount(accessToken)
         } catch (e: Exception) {
             log.error("Login failed {}", accessToken, e)
-            return "redirect:" + client.failure
+            return "redirect:${client.failure}"
         }
 
         val user = users.findOrCreate(account)
@@ -115,7 +115,7 @@ abstract class OAuthLoginController<out S : OAuthService<T>, T : Token> protecte
                     .replace("[state]", request.state ?: "")
         }
         log.debug("Redirecting to {}", redirectTo)
-        return "redirect:" + redirectTo
+        return "redirect:$redirectTo"
     }
 
     protected abstract val authorizationUrl: String

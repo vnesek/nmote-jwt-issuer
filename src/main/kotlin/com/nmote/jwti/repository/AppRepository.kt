@@ -15,6 +15,7 @@
 
 package com.nmote.jwti.model
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component
@@ -31,7 +32,7 @@ interface AppRepository {
     fun findByAudience(audience: String): App?
 }
 
-//@ConditionalOnProperty(prefix="issuer.applications",)
+//@ConditionalOnMissingBean(AppRepository::class)
 @Component
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "issuer")
@@ -42,8 +43,7 @@ class DefaultAppRepository : AppRepository {
         return app
     }
 
-    override fun findAll(): Iterable<App>
-            = applications.values
+    override fun findAll(): Iterable<App> = applications.values
 
     override var url: String? = null
 

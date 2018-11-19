@@ -18,13 +18,13 @@ package com.nmote.jwti.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.hibernate.validator.constraints.Email
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Field
 import java.io.Serializable
 import java.time.Instant
 import java.util.*
+import javax.validation.constraints.Email
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class UserData(
@@ -43,7 +43,7 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
 
     @Id
     @JsonProperty("id")
-    override val accountId: String = UUID.randomUUID().toString()
+    override var accountId: String = UUID.randomUUID().toString()
 
     @Field("imageURL")
     @JsonProperty("imageURL")
@@ -68,8 +68,7 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
     override val profileEmail: String? = null
         get() = field ?: firstOrNull(SocialAccount<*>::profileEmail)
 
-    fun <R : Any> firstOrNull(transform: (SocialAccount<*>) -> R?): R?
-            = accounts.map(transform).filterNotNull().firstOrNull()
+    fun <R : Any> firstOrNull(transform: (SocialAccount<*>) -> R?): R? = accounts.map(transform).filterNotNull().firstOrNull()
 
     var username: String? = null
 
@@ -81,8 +80,7 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
 
     var createdAt: Instant = Instant.now()
 
-    operator fun get(id: String, service: String): BasicSocialAccount?
-            = accounts.find { it.socialService == service && it.accountId == id }
+    operator fun get(id: String, service: String): BasicSocialAccount? = accounts.find { it.socialService == service && it.accountId == id }
 
     operator fun get(account: SocialAccount<*>): BasicSocialAccount? = get(account.accountId, account.socialService)
 
@@ -105,7 +103,7 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
         accounts += user.accounts
         val r = roles.toMutableMap()
         for ((app, roles) in user.roles) {
-            r.merge(app, roles, { u, v -> u + v })
+            r.merge(app, roles) { u, v -> u + v }
         }
     }
 }

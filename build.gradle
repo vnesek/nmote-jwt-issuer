@@ -1,74 +1,62 @@
-buildscript {
-    ext {
-        kotlinVersion = '1.2.71'
-        springBootVersion = '1.5.13.RELEASE'
-        ningVersion = '1.9.38'
-        restfbVersion = '2.5.0'
-        scribejavaVersion = '4.2.0'
-        ahcVersion = '2.0.30'
-        jwtVersion = '0.9.0'
-    }
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlinVersion"
-    }
-}
-
 plugins {
     id 'com.github.ben-manes.versions' version '0.20.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.10'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.3.10'
+    id 'org.jetbrains.kotlin.plugin.jpa' version '1.3.10'
+    id 'org.jetbrains.kotlin.kapt' version '1.3.10'
+    id 'org.springframework.boot' version '2.1.0.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.6.RELEASE'
 }
 
-
-apply plugin: 'kotlin'
-apply plugin: 'kotlin-spring'
-apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
-
-sourceCompatibility = 1.8
 description = 'JWT Token Issuer'
 
+sourceCompatibility = 1.8
+
 compileKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjsr305=strict']
+        jvmTarget = '1.8'
+    }
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjsr305=strict']
+        jvmTarget = '1.8'
+    }
 }
 
 repositories {
     mavenCentral()
-    mavenLocal()
     jcenter()
 }
 
-jar {
+bootJar {
+    mainClassName = 'net.photomath.mathcms.MathCmsBackendApplicationKt'
     baseName = 'issuer'
     version = ['git', 'rev-parse', '--short', 'HEAD'].execute().text.trim()
+    launchScript {
+        properties['initInfoDescription'] = project.description
+        properties['initInfoDescription'] = project.description
+        properties['initInfoShortDescription'] = project.name
+        properties['initInfoProvides'] = project.name
+        properties['mode'] = 'service'
+    }
 }
 
 dependencies {
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    compile "com.github.scribejava:scribejava-apis:$scribejavaVersion"
-    compile "com.github.scribejava:scribejava-httpclient-ahc:$scribejavaVersion"
-    compile "org.asynchttpclient:async-http-client:$ahcVersion"
-    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    compile "com.restfb:restfb:$restfbVersion"
-    compile "io.jsonwebtoken:jjwt:$jwtVersion"
+    //implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${project.ext.'kotlin.version'}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "com.github.scribejava:scribejava-apis:${project.ext.'scribejava.version'}"
+    implementation "com.github.scribejava:scribejava-httpclient-ahc:${project.ext.'scribejava.version'}"
+    implementation "org.asynchttpclient:async-http-client:${project.ext.'ahc.version'}"
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation "com.restfb:restfb:${project.ext.'restfb.version'}"
+    implementation "io.jsonwebtoken:jjwt:${project.ext.'jjwt.version'}"
 
-    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-springBoot {
-    executable = true
-    embeddedLaunchScriptProperties = [
-            initInfoDescription     : project.description,
-            initInfoShortDescription: project.name,
-            initInfoProvides        : jar.baseName,
-            mode                    : 'service'
-    ]
-}

@@ -43,7 +43,7 @@ class AdminController(
     @GetMapping("health")
     fun health(): Map<String, Boolean> {
         val usersOk = try {
-            users.findOne("ignored")
+            users.findById("ignored")
             true
         } catch (e: Throwable) {
             false
@@ -87,7 +87,7 @@ class AdminController(
         val user = u[0]
         val mergees = u.subList(1, u.size)
         mergees.forEach(user::merge)
-        users.delete(mergees)
+        users.deleteAll(mergees)
         users.save(user)
         return user.toUserData(app)
     }
@@ -116,11 +116,11 @@ class AdminController(
         auth.hasScope("issuer:admin")
         val app = getApp()
         val user = getUser(id)
-        users.delete(setOf(user))
+        users.deleteAll(setOf(user))
         return user.toUserData(app)
     }
 
-    private fun getUser(id: String) = users.findOne(id) ?: throw UserNotFoundException(id)
+    private fun getUser(id: String) = users.findById(id).orElseThrow { UserNotFoundException(id) }
 
     private fun User.toUserData(app: App) = UserData(
             id = accountId,

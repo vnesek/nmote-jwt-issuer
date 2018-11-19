@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import javax.servlet.http.HttpServletResponse
 
-@ConditionalOnBean(name = arrayOf("facebookOAuthService"))
+@ConditionalOnBean(name = ["facebookOAuthService"])
 @Controller
 @RequestMapping("/facebook")
 class FacebookLoginController(
@@ -58,7 +58,7 @@ class FacebookLoginController(
     }
 
     override fun getSocialAccount(accessToken: OAuth2AccessToken): FacebookAccount {
-        val facebookClient = DefaultFacebookClient(accessToken.accessToken, appSecret, Version.VERSION_2_6)
+        val facebookClient = DefaultFacebookClient(accessToken.accessToken, appSecret, Version.VERSION_2_12)
 
         // Fetch user info
         val fields = "id,email,first_name,last_name,middle_name,name,website"
@@ -69,7 +69,7 @@ class FacebookLoginController(
     }
 
     override val authorizationUrl: String
-        get() = service.getAuthorizationUrl(null)
+        get() = service.authorizationUrl
 
 
 }

@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-@ConditionalOnProperty(prefix = "issuer.google", name = arrayOf("id", "scope", "secret", "callback"))
+@ConditionalOnProperty(prefix = "issuer.google", name = ["id", "scope", "secret", "callback"])
 @Configuration
 class GoogleConfig {
 

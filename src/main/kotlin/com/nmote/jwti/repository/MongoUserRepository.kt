@@ -20,11 +20,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.stereotype.Repository
+import java.util.*
 
-@ConditionalOnProperty("issuer.repository.mongo")
+@ConditionalOnProperty(value= ["issuer.repository.mongo"], matchIfMissing = true)
 @Repository
 interface MongoUserRepository : MongoRepository<User, String>, UserRepository {
 
     @Query("{ accounts : { \$elemMatch: { accountId: ?0, socialService: ?1 } } }")
-    override fun findBySocialAccount(accountId: String, socialService: String): User?
+    override fun findBySocialAccount(accountId: String, socialService: String): Optional<User>
 }

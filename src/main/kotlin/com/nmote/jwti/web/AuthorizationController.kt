@@ -48,12 +48,12 @@ class AuthorizationController(
         return Pair(app, client)
     }
 
-    @RequestMapping(params = arrayOf("grant_type=password"))
+    @RequestMapping(params = ["grant_type=password"])
     @ResponseBody
     fun resourceOwnerPasswordCredentials(request: OAuth2Request, @RequestHeader(value = "Authorization", required = false) authorization: String?): Map<String, *> {
         val (app, client) = authorizeClient(request, authorization)
         val username = request.username ?: throw OAuthException(OAuthError.invalid_request)
-        val user = users.findByUsername(username) ?: throw OAuthException(OAuthError.invalid_grant)
+        val user = users.findByUsername(username).orElseThrow { OAuthException(OAuthError.invalid_grant) }
         if (user.password != request.password) throw OAuthException(OAuthError.invalid_grant)
 
         // Determine expires
@@ -77,7 +77,7 @@ class AuthorizationController(
         )
     }
 
-    @RequestMapping(params = arrayOf("grant_type=client_credentials"))
+    @RequestMapping(params = ["grant_type=client_credentials"])
     @ResponseBody
     fun clientCredentials(request: OAuth2Request, @RequestHeader(value = "Authorization", required = false) authorization: String?): Map<String, *> {
         val (app, client) = authorizeClient(request, authorization)

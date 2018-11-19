@@ -16,21 +16,18 @@
 package com.nmote.jwti.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.github.scribejava.apis.google.GoogleToken
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth2AccessToken
-import org.hibernate.validator.constraints.Email
 import org.springframework.data.mongodb.core.mapping.Field
 import java.io.Serializable
 import java.time.Instant
+import javax.validation.constraints.Email
 
 @Suppress("LeakingThis")
 open class BasicSocialAccount : SocialAccount<JwtiAccessToken>, Serializable {
 
-    constructor()
-
     constructor(account: SocialAccount<*>) {
-        this.source = account
+        //this.source = account
 
         profileEmail = account.profileEmail
         profileName = account.profileName
@@ -40,7 +37,6 @@ open class BasicSocialAccount : SocialAccount<JwtiAccessToken>, Serializable {
 
         val token = account.accessToken
         accessToken = when (token) {
-            is GoogleToken -> JwtiOAuth2AccessToken(token)
             is OAuth2AccessToken -> JwtiOAuth2AccessToken(token)
             is OAuth1AccessToken -> JwtiOAuth1AccessToken(token)
             else -> null
@@ -69,8 +65,6 @@ open class BasicSocialAccount : SocialAccount<JwtiAccessToken>, Serializable {
     override var socialService: String = "?"
 
     override var accessToken: JwtiAccessToken? = null
-
-    var source: Any? = null
 
     var createdAt: Instant = Instant.now()
 }

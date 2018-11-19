@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-@ConditionalOnProperty(prefix = "issuer.twitter", name = arrayOf("id", "secret", "callback"))
+@ConditionalOnProperty(prefix = "issuer.twitter", name = ["id", "secret", "callback"])
 @Configuration
 class TwitterConfig {
 

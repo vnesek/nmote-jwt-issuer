@@ -17,7 +17,6 @@ package com.nmote.jwti.repository
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.User
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,6 +29,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 import java.time.Instant
+import java.util.*
 
 private val LIST_OF_USERS = object : TypeReference<List<User>>() {}
 
@@ -40,23 +40,23 @@ class FileUserRepository @Autowired constructor(
         val mapper: ObjectMapper
 ) : UserRepository {
 
-    override fun findByUsername(username: String): User? {
+    override fun findByUsername(username: String): Optional<User> {
         refresh()
-        return users.find { it.username.equals(username, true) }
+        return Optional.ofNullable(users.firstOrNull { it.username.equals(username, true) })
     }
 
-    override fun delete(usersToDelete: Iterable<User>) {
+    override fun deleteAll(user: Iterable<User>) {
         synchronized(this) {
             refresh()
-            val toDelete = usersToDelete.map(User::accountId).toSet()
+            val toDelete = user.map(User::accountId).toSet()
             users.removeIf { toDelete.contains(it.accountId) }
             saveUsers()
         }
     }
 
-    override fun findOne(id: String): User? = synchronized(this) {
+    override fun findById(id: String): Optional<User> = synchronized(this) {
         refresh()
-        return users.find { it.accountId == id }
+        return Optional.ofNullable(users.firstOrNull { it.accountId == id })
     }
 
     override fun findAll(): Collection<User> = users;
@@ -69,20 +69,14 @@ class FileUserRepository @Autowired constructor(
 
     private fun getLastModifiedFileTime() = try {
         Files.getLastModifiedTime(Paths.get(usersFile))
-    } catch(ignored: Exception) {
+    } catch (ignored: Exception) {
         FileTime.from(Instant.now())
     }
 
-    override fun findBySocialAccount(accountId: String, socialService: String): User? = synchronized(this) {
+    override fun findBySocialAccount(accountId: String, socialService: String): Optional<User> = synchronized(this) {
         refresh()
-        return users.filter { it[accountId, socialService] != null }.firstOrNull()
+        return Optional.ofNullable(users.firstOrNull { it[accountId, socialService] != null })
     }
-
-    private operator fun get(account: SocialAccount<*>): User?
-            = findBySocialAccount(account.accountId, account.socialService)
-
-    private operator fun get(id: String): User?
-            = users.filter { it.accountId == id }.firstOrNull()
 
     fun refresh() = synchronized(this) {
         if (lastModified.toInstant().isBefore(Instant.now().plusSeconds(15))) {

@@ -38,7 +38,8 @@ class Client {
 data class AppData(
         val id: String,
         val audience: String?,
-        val roles: Set<String>)
+        val roles: Set<String>
+)
 
 class App {
 
