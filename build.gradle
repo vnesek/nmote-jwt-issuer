@@ -32,7 +32,7 @@ repositories {
 }
 
 bootJar {
-    mainClassName = 'net.photomath.mathcms.MathCmsBackendApplicationKt'
+    mainClassName = 'com.nmote.jwti.JwtIssuerApplication.kt'
     baseName = 'issuer'
     version = ['git', 'rev-parse', '--short', 'HEAD'].execute().text.trim()
     launchScript {
