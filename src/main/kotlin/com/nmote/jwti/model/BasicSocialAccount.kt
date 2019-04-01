@@ -34,7 +34,7 @@ private fun jwtiAccessToken(token: Any?) = when (token) {
 }
 
 
-@Suppress("LeakingThis")
+@Suppress("LeakingThis", "unused")
 open class BasicSocialAccount : SocialAccount<JwtiAccessToken>, Serializable {
 
     constructor(account: SocialAccount<*>) {
@@ -63,6 +63,8 @@ open class BasicSocialAccount : SocialAccount<JwtiAccessToken>, Serializable {
         profileImageURL = imageUrl
         accessToken = jwtiAccessToken(token)
     }
+
+    constructor()
 
     @Field("email")
     @JsonProperty("email")
