@@ -32,7 +32,7 @@ repositories {
 }
 
 bootJar {
-    mainClassName = 'com.nmote.jwti.JwtIssuerApplication.kt'
+    mainClassName = 'com.nmote.jwti.JwtIssuerApplicationKt'
     baseName = 'issuer'
     version = ['git', 'rev-parse', '--short', 'HEAD'].execute().text.trim()
     launchScript {
