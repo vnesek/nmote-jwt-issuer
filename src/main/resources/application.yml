@@ -32,7 +32,7 @@ issuer:
     id: <app-id>
     secret: <secret>
     callback: http://localhost:8080/google/callback
-    scope: email
+    scope: openid profile email
 
   applications:
     demo0:

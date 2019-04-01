@@ -16,12 +16,23 @@
 package com.nmote.jwti.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.scribejava.apis.openid.OpenIdOAuth2AccessToken
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth2AccessToken
 import org.springframework.data.mongodb.core.mapping.Field
 import java.io.Serializable
 import java.time.Instant
 import javax.validation.constraints.Email
+
+private fun jwtiAccessToken(token: Any?) = when (token) {
+    null -> null
+    is OpenIdOAuth2AccessToken -> JwtiOAuth2AccessToken(token)
+    is OAuth2AccessToken -> JwtiOAuth2AccessToken(token)
+    is OAuth1AccessToken -> JwtiOAuth1AccessToken(token)
+    is JwtiAccessToken -> token
+    else -> null
+}
+
 
 @Suppress("LeakingThis")
 open class BasicSocialAccount : SocialAccount<JwtiAccessToken>, Serializable {
@@ -34,13 +45,23 @@ open class BasicSocialAccount : SocialAccount<JwtiAccessToken>, Serializable {
         profileImageURL = account.profileImageURL
         accountId = account.accountId
         socialService = account.socialService
+        accessToken = jwtiAccessToken(account.accessToken)
+    }
 
-        val token = account.accessToken
-        accessToken = when (token) {
-            is OAuth2AccessToken -> JwtiOAuth2AccessToken(token)
-            is OAuth1AccessToken -> JwtiOAuth1AccessToken(token)
-            else -> null
-        }
+    constructor(
+            service: String,
+            id: String,
+            name: String? = null,
+            email: String? = null,
+            imageUrl: String? = null,
+            token: Any? = null
+    ) {
+        socialService = service
+        accountId = id
+        profileName = name
+        profileEmail = email
+        profileImageURL = imageUrl
+        accessToken = jwtiAccessToken(token)
     }
 
     @Field("email")

@@ -17,6 +17,7 @@ package com.nmote.jwti.model
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.scribejava.apis.openid.OpenIdOAuth2AccessToken
 import com.github.scribejava.core.model.OAuth2AccessToken
 import org.springframework.data.annotation.PersistenceConstructor
 
@@ -31,4 +32,8 @@ class JwtiOAuth2AccessToken @JsonCreator @PersistenceConstructor constructor(
 ) : OAuth2AccessToken(accessToken, tokenType, expiresIn, refreshToken, scope, rawResponse), JwtiAccessToken {
 
     constructor(t: OAuth2AccessToken) : this(t.accessToken, t.tokenType, t.expiresIn, t.refreshToken, t.scope, t.rawResponse)
+
+    constructor(t: OpenIdOAuth2AccessToken): this(t as OAuth2AccessToken) {
+        this.openIdToken = t.openIdToken
+    }
 }

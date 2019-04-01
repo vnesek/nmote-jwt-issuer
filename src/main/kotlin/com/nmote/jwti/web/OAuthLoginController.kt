@@ -77,7 +77,7 @@ abstract class OAuthLoginController<out S : OAuthService, T : Token> protected c
         val clientId = request.client_id ?: return "redirect:/missing-client-id"
         val (app, client) = apps[clientId] ?: return "redirect:/unknown-application"
 
-        val account: SocialAccount<T> = try {
+        val account: SocialAccount<*> = try {
             getSocialAccount(accessToken)
         } catch (e: Exception) {
             log.error("Login failed {}", accessToken, e)
@@ -120,7 +120,7 @@ abstract class OAuthLoginController<out S : OAuthService, T : Token> protected c
 
     protected abstract val authorizationUrl: String
 
-    protected abstract fun getSocialAccount(accessToken: T): SocialAccount<T>
+    protected abstract fun getSocialAccount(accessToken: T): SocialAccount<*>
 
     protected val log = LoggerFactory.getLogger(javaClass)!!
 }

@@ -34,7 +34,7 @@ class FacebookConfig {
             @Value("\${issuer.facebook.callback}") callbackURI: String
     ) = ServiceBuilder(appId)
             .apiSecret(appSecret)
-            .scope(appScope)
+            .withScope(appScope)
             .callback(callbackURI)
             .build(FacebookApi.instance())
 }

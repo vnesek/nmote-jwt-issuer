@@ -93,7 +93,7 @@ class DefaultJwtAuthenticationService(val request: HttpServletRequest, val apps:
         get() = authentication.body.audience
 }
 
-private fun JwtParser.parseClaimsJwtIgnoreSignature(token: String): Jwt<Header<*>, Claims> {
+fun JwtParser.parseClaimsJwtIgnoreSignature(token: String): Jwt<Header<*>, Claims> {
     val lastDot = token.lastIndexOf('.')
     val tokenWithoutSignature = token.substring(0, lastDot + 1)
     return parseClaimsJwt(tokenWithoutSignature)
