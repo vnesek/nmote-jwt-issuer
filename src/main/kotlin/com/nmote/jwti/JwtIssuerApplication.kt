@@ -19,7 +19,7 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
 
-@SpringBootApplication(exclude = [MongoAutoConfiguration::class])
+@SpringBootApplication//(exclude = [MongoAutoConfiguration::class])
 class JwtIssuerApplication
 
 fun main(args: Array<String>) {
