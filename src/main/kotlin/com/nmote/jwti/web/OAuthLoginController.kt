@@ -21,7 +21,7 @@ import com.github.scribejava.core.model.OAuth2AccessToken
 import com.github.scribejava.core.model.Token
 import com.github.scribejava.core.oauth.OAuthService
 import com.nmote.jwti.model.App
-import com.nmote.jwti.model.AppRepository
+import com.nmote.jwti.repository.AppRepository
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.User
 import com.nmote.jwti.repository.UserRepository

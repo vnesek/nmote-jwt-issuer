@@ -16,6 +16,7 @@
 package com.nmote.jwti.web
 
 import com.nmote.jwti.model.*
+import com.nmote.jwti.repository.AppRepository
 import com.nmote.jwti.repository.UserRepository
 import com.nmote.jwti.service.ScopeService
 import org.springframework.stereotype.Controller

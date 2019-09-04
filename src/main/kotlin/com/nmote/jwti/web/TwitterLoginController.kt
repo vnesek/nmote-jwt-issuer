@@ -21,7 +21,7 @@ import com.github.scribejava.core.model.OAuth1RequestToken
 import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
 import com.github.scribejava.core.oauth.OAuth10aService
-import com.nmote.jwti.model.AppRepository
+import com.nmote.jwti.repository.AppRepository
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.TwitterAccount
 import com.nmote.jwti.repository.UserRepository

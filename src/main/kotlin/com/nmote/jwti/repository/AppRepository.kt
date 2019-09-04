@@ -13,8 +13,10 @@
  *   limitations under the License.
  */
 
-package com.nmote.jwti.model
+package com.nmote.jwti.repository
 
+import com.nmote.jwti.model.App
+import com.nmote.jwti.model.Client
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component

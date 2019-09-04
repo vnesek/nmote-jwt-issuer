@@ -15,14 +15,16 @@
 
 package com.nmote.jwti.repository
 
+import com.mongodb.MongoClient
 import com.nmote.jwti.model.User
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.stereotype.Repository
 import java.util.*
 
-@ConditionalOnProperty(value = ["issuer.repository.mongo"], matchIfMissing = true)
+//@ConditionalOnProperty(value = ["issuer.repository.mongo"])
+@ConditionalOnBean(MongoClient::class)
 @Repository
 interface MongoUserRepository : MongoRepository<User, String>, UserRepository {
 

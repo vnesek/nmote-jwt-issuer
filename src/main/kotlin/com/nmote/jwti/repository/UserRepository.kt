@@ -15,7 +15,6 @@
 
 package com.nmote.jwti.repository
 
-
 import com.nmote.jwti.model.BasicSocialAccount
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.model.User

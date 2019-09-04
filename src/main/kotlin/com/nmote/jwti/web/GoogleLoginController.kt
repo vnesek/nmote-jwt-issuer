@@ -18,7 +18,7 @@ package com.nmote.jwti.web
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.scribejava.apis.openid.OpenIdOAuth2AccessToken
 import com.github.scribejava.core.oauth.OAuth20Service
-import com.nmote.jwti.model.AppRepository
+import com.nmote.jwti.repository.AppRepository
 import com.nmote.jwti.model.BasicSocialAccount
 import com.nmote.jwti.model.SocialAccount
 import com.nmote.jwti.repository.UserRepository

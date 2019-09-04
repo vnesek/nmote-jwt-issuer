@@ -18,7 +18,7 @@ package com.nmote.jwti.web
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.scribejava.core.model.OAuth2AccessToken
 import com.github.scribejava.core.oauth.OAuth20Service
-import com.nmote.jwti.model.AppRepository
+import com.nmote.jwti.repository.AppRepository
 import com.nmote.jwti.model.FacebookAccount
 import com.nmote.jwti.repository.UserRepository
 import com.nmote.jwti.service.ScopeService

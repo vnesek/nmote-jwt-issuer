@@ -15,7 +15,7 @@
 
 package com.nmote.jwti.service
 
-import com.nmote.jwti.model.AppRepository
+import com.nmote.jwti.repository.AppRepository
 import io.jsonwebtoken.*
 import org.springframework.context.annotation.Scope
 import org.springframework.context.annotation.ScopedProxyMode
