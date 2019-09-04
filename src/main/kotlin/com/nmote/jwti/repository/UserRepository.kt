@@ -37,7 +37,8 @@ interface UserRepository {
 
 fun UserRepository.findOrCreate(account: SocialAccount<*>): User {
     val user = (findBySocialAccount(account.accountId, account.socialService)).orElse(User())
-    user.plus(account as? BasicSocialAccount ?: BasicSocialAccount(account))
+    val acc = account as? BasicSocialAccount ?: BasicSocialAccount(account)
+    user.plus(acc)
     return save(user)
 }
 

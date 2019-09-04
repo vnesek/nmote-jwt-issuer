@@ -38,8 +38,6 @@ private fun jwtiAccessToken(token: Any?) = when (token) {
 open class BasicSocialAccount : SocialAccount<JwtiAccessToken>, Serializable {
 
     constructor(account: SocialAccount<*>) {
-        //this.source = account
-
         profileEmail = account.profileEmail
         profileName = account.profileName
         profileImageURL = account.profileImageURL

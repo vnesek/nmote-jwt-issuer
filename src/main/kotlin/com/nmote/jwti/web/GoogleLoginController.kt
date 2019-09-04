@@ -17,14 +17,14 @@ package com.nmote.jwti.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.scribejava.apis.openid.OpenIdOAuth2AccessToken
+import com.github.scribejava.core.model.OAuthRequest
+import com.github.scribejava.core.model.Verb
 import com.github.scribejava.core.oauth.OAuth20Service
-import com.nmote.jwti.repository.AppRepository
-import com.nmote.jwti.model.BasicSocialAccount
+import com.nmote.jwti.config.GoogleAccount
 import com.nmote.jwti.model.SocialAccount
+import com.nmote.jwti.repository.AppRepository
 import com.nmote.jwti.repository.UserRepository
 import com.nmote.jwti.service.ScopeService
-import com.nmote.jwti.service.parseClaimsJwtIgnoreSignature
-import io.jsonwebtoken.Jwts
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -58,19 +58,13 @@ constructor(
     }
 
     override fun getSocialAccount(accessToken: OpenIdOAuth2AccessToken): SocialAccount<*> {
-        val parser = Jwts.parser()
-        parser.setAllowedClockSkewSeconds(7200)
-
-        val jwt = parser.parseClaimsJwtIgnoreSignature(accessToken.openIdToken)
-        val body = jwt.body!!
-        return BasicSocialAccount(
-            "google",
-            body.subject,
-            body["name"] as? String,
-            body["email"] as? String,
-            body["picture"] as? String,
-            accessToken
-        )
+        val request = OAuthRequest(Verb.GET, "https://www.googleapis.com/oauth2/v3/userinfo")
+        service.signRequest(accessToken, request)
+        val response = service.execute(request)
+        val responseBody = response.body
+        val account = objectMapper.readValue(responseBody, GoogleAccount::class.java)
+        account.accessToken = accessToken
+        return account
     }
 
     override val authorizationUrl: String

@@ -135,7 +135,8 @@ fun issueToken(
     imageURL: String? = null,
     expiresIn: Long = 6000
 ): String {
-    val jws = Jwts.builder()
+    //log.debug("Issued access token for {} to {} scope {}", app.id, name, scope)
+    return Jwts.builder()
         .setAudience(app.audience)
         .setSubject(user.username ?: user.accountId)
         .setIssuedAt(Date())
@@ -147,8 +148,6 @@ fun issueToken(
         .signWith(app.algorithm, app.key)
         .setExpiration(Date.from(Instant.now().plusSeconds(expiresIn)))
         .compact()
-    //log.debug("Issued access token for {} to {} scope {}", app.id, name, scope)
-    return jws
 }
 
 

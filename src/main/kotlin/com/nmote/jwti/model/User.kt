@@ -47,12 +47,12 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
 
     @Field("imageURL")
     @JsonProperty("imageURL")
-    override val profileImageURL: String? = null
+    override var profileImageURL: String? = null
         get() = field ?: firstOrNull(SocialAccount<*>::profileImageURL)
 
     @Field("name")
     @JsonProperty("name")
-    override val profileName: String? = null
+    override var profileName: String? = null
         get() = field ?: firstOrNull(SocialAccount<*>::profileName)
 
     @Transient
@@ -65,10 +65,10 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
     @Field("email")
     @JsonProperty("email")
     @get:Email
-    override val profileEmail: String? = null
+    override var profileEmail: String? = null
         get() = field ?: firstOrNull(SocialAccount<*>::profileEmail)
 
-    fun <R : Any> firstOrNull(transform: (SocialAccount<*>) -> R?): R? = accounts.map(transform).filterNotNull().firstOrNull()
+    private fun <R : Any> firstOrNull(transform: (SocialAccount<*>) -> R?): R? = accounts.mapNotNull(transform).firstOrNull()
 
     var username: String? = null
 
@@ -90,6 +90,10 @@ class User : SocialAccount<JwtiAccessToken>, Serializable {
     operator fun plus(account: BasicSocialAccount): User {
         this.minus(account)
         this.accounts += account
+        // Update name / image / email from social account
+        account.profileEmail?.let { profileEmail = it }
+        account.profileImageURL?.let { profileImageURL = it }
+        account.profileName?.let { profileName = it }
         return this
     }
 
