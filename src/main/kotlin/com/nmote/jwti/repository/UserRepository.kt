@@ -25,7 +25,7 @@ interface UserRepository {
 
     fun deleteAll(user: Iterable<User>)
 
-    fun findById(id : String): Optional<User>
+    fun findById(id: String): Optional<User>
 
     fun save(user: User): User
 

@@ -36,8 +36,8 @@ private val LIST_OF_USERS = object : TypeReference<List<User>>() {}
 @ConditionalOnProperty("issuer.repository.file")
 @Repository
 class FileUserRepository @Autowired constructor(
-        @Value("\${issuer.repository.file}") val usersFile: String,
-        val mapper: ObjectMapper
+    @Value("\${issuer.repository.file}") val usersFile: String,
+    val mapper: ObjectMapper
 ) : UserRepository {
 
     override fun findByUsername(username: String): Optional<User> {

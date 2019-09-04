@@ -62,16 +62,17 @@ class DefaultJwtAuthenticationService(val request: HttpServletRequest, val apps:
     override val subject: String?
         get() = authentication.body.subject
 
-    override val authentication: Jws<Claims> get() {
-        @Suppress("UNCHECKED_CAST")
-        var jws = request.getAttribute(tokenKey) as? Jws<Claims>
-        if (jws == null) {
-            val token = request.getBearerToken() ?: throw TokenMissingException()
-            jws = getJws(token)
-            request.setAttribute(tokenKey, jws)
+    override val authentication: Jws<Claims>
+        get() {
+            @Suppress("UNCHECKED_CAST")
+            var jws = request.getAttribute(tokenKey) as? Jws<Claims>
+            if (jws == null) {
+                val token = request.getBearerToken() ?: throw TokenMissingException()
+                jws = getJws(token)
+                request.setAttribute(tokenKey, jws)
+            }
+            return jws
         }
-        return jws
-    }
 
     private fun getJws(token: String): Jws<Claims> {
         // Get audience from token
@@ -99,7 +100,7 @@ fun JwtParser.parseClaimsJwtIgnoreSignature(token: String): Jwt<Header<*>, Claim
     return parseClaimsJwt(tokenWithoutSignature)
 }
 
-private val tokenKey = "com.nmote.jwti.token"
+private const val tokenKey = "com.nmote.jwti.token"
 
 private fun String.bearerToken(): String? {
     val space = indexOf(' ')

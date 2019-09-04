@@ -17,6 +17,7 @@ package com.nmote.jwti.config
 
 import com.github.scribejava.apis.TwitterApi
 import com.github.scribejava.core.builder.ServiceBuilder
+import com.github.scribejava.core.oauth.OAuth10aService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
@@ -28,13 +29,13 @@ class TwitterConfig {
 
     @Bean
     fun twitterOAuthService(
-            @Value("\${issuer.twitter.id}") appId: String,
-            @Value("\${issuer.twitter.secret}") appSecret: String,
-            @Value("\${issuer.twitter.callback}") callbackURI: String
-    ) = ServiceBuilder(appId)
-            .apiSecret(appSecret)
-            .callback(callbackURI)
-            .build(TwitterApi.Authenticate.instance())
+        @Value("\${issuer.twitter.id}") appId: String,
+        @Value("\${issuer.twitter.secret}") appSecret: String,
+        @Value("\${issuer.twitter.callback}") callbackURI: String
+    ): OAuth10aService = ServiceBuilder(appId)
+        .apiSecret(appSecret)
+        .callback(callbackURI)
+        .build(TwitterApi.Authenticate.instance())
 }
 
 

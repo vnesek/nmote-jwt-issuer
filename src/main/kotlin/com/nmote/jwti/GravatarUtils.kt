@@ -21,14 +21,14 @@ import javax.xml.bind.DatatypeConverter
 
 private val HOSTS = arrayOf("0", "1", "2", "3")
 
-private val MD5 = ThreadLocal.withInitial({ MessageDigest.getInstance("MD5") })
+private val MD5 = ThreadLocal.withInitial { MessageDigest.getInstance("MD5") }
 
 private fun hash(src: String): String {
     val s = src.toLowerCase().trim()
-    try {
-        return DatatypeConverter.printHexBinary(MD5.get().digest(s.toByteArray(StandardCharsets.UTF_8)))
+    return try {
+        DatatypeConverter.printHexBinary(MD5.get().digest(s.toByteArray(StandardCharsets.UTF_8)))
     } catch (ignored: Exception) {
-        return "error"
+        "error"
     }
 }
 

@@ -42,10 +42,10 @@ class TokenController(private val tokens: TokenCache) {
         val expiration = Duration.between(Instant.now(), jwt.body.expiration.toInstant())
         val scope = jwt.body["scope"]
         return mapOf(
-                "access_token" to token,
-                "expires_in" to expiration.seconds,
-                "token_type" to "bearer",
-                "scope" to scope
+            "access_token" to token,
+            "expires_in" to expiration.seconds,
+            "token_type" to "bearer",
+            "scope" to scope
         )
     }
 }

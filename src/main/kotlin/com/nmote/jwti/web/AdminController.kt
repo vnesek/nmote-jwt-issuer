@@ -34,10 +34,10 @@ class UserNotFoundException(id: String) : JwtException(id)
 @CrossOrigin
 @RestController
 class AdminController(
-        private val users: UserRepository,
-        private val apps: AppRepository,
-        private val auth: JwtAuthenticationService,
-        private val scopes: ScopeService
+    private val users: UserRepository,
+    private val apps: AppRepository,
+    private val auth: JwtAuthenticationService,
+    private val scopes: ScopeService
 ) {
 
     @GetMapping("health")
@@ -55,9 +55,9 @@ class AdminController(
             false
         }
         return mapOf(
-                "users" to usersOk,
-                "apps" to appsOk,
-                "running" to (usersOk && appsOk)
+            "users" to usersOk,
+            "apps" to appsOk,
+            "running" to (usersOk && appsOk)
         )
     }
 
@@ -123,21 +123,21 @@ class AdminController(
     private fun getUser(id: String) = users.findById(id).orElseThrow { UserNotFoundException(id) }
 
     private fun User.toUserData(app: App) = UserData(
-            id = accountId,
-            username = username,
-            type = socialService,
-            name = profileName,
-            email = profileEmail,
-            image = profileImageURL,
-            roles = roles[app.id],
-            scope = scopes.scopeFor(this, app),
-            accounts = accounts.map { it.toUserData(app) })
+        id = accountId,
+        username = username,
+        type = socialService,
+        name = profileName,
+        email = profileEmail,
+        image = profileImageURL,
+        roles = roles[app.id],
+        scope = scopes.scopeFor(this, app),
+        accounts = accounts.map { it.toUserData(app) })
 
     private fun SocialAccount<*>.toUserData(app: App) = UserData(
-            id = accountId,
-            type = socialService,
-            name = profileName,
-            email = profileEmail,
-            scope = scopes.scopeFor(this, app),
-            image = profileImageURL)
+        id = accountId,
+        type = socialService,
+        name = profileName,
+        email = profileEmail,
+        scope = scopes.scopeFor(this, app),
+        image = profileImageURL)
 }

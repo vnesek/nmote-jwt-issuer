@@ -39,19 +39,19 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping("/google")
 class GoogleLoginController @Autowired
 constructor(
-        @Qualifier("googleOAuthService") service: OAuth20Service,
-        objectMapper: ObjectMapper,
-        users: UserRepository,
-        apps: AppRepository,
-        tokens: TokenCache,
-        scopes: ScopeService
+    @Qualifier("googleOAuthService") service: OAuth20Service,
+    objectMapper: ObjectMapper,
+    users: UserRepository,
+    apps: AppRepository,
+    tokens: TokenCache,
+    scopes: ScopeService
 ) : OAuthLoginController<OAuth20Service, OpenIdOAuth2AccessToken>(service, objectMapper, users, apps, tokens, scopes) {
 
     @RequestMapping("callback")
     fun callback(
-            @RequestParam code: String,
-            @CookieValue("authState") authState: String,
-            response: HttpServletResponse
+        @RequestParam code: String,
+        @CookieValue("authState") authState: String,
+        response: HttpServletResponse
     ): String {
         val accessToken = service.getAccessToken(code) as OpenIdOAuth2AccessToken
         return callback(accessToken, authState, response)
@@ -64,12 +64,12 @@ constructor(
         val jwt = parser.parseClaimsJwtIgnoreSignature(accessToken.openIdToken)
         val body = jwt.body!!
         return BasicSocialAccount(
-                "google",
-                body.subject,
-                body["name"] as? String,
-                body["email"] as? String,
-                body["picture"] as? String,
-                accessToken
+            "google",
+            body.subject,
+            body["name"] as? String,
+            body["email"] as? String,
+            body["picture"] as? String,
+            accessToken
         )
     }
 

@@ -37,12 +37,12 @@ import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 
 abstract class OAuthLoginController<out S : OAuthService, T : Token> protected constructor(
-        protected val service: S,
-        protected val objectMapper: ObjectMapper,
-        protected val users: UserRepository,
-        protected val apps: AppRepository,
-        protected val tokens: TokenCache,
-        protected val scopes: ScopeService
+    protected val service: S,
+    protected val objectMapper: ObjectMapper,
+    protected val users: UserRepository,
+    protected val apps: AppRepository,
+    protected val tokens: TokenCache,
+    protected val scopes: ScopeService
 ) {
 
     // TODO Filter scopes based on auth request
@@ -93,14 +93,14 @@ abstract class OAuthLoginController<out S : OAuthService, T : Token> protected c
         }
 
         val jws = issueToken(
-                user,
-                app,
-                scopes.scopeFor(user, app),
-                apps.url,
-                account.profileEmail,
-                account.profileName,
-                account.profileImageURL,
-                client.expiresIn ?: tokenExpiresIn ?: 6000)
+            user,
+            app,
+            scopes.scopeFor(user, app),
+            apps.url,
+            account.profileEmail,
+            account.profileName,
+            account.profileImageURL,
+            client.expiresIn ?: tokenExpiresIn ?: 6000)
 
         val code = tokens.put(jws)
 
@@ -110,9 +110,9 @@ abstract class OAuthLoginController<out S : OAuthService, T : Token> protected c
             if (!request.state.isNullOrBlank()) redirectTo += "&state=${request.state}"
         } else {
             redirectTo = client.success
-                    .replace("[token]", jws)
-                    .replace("[code]", code)
-                    .replace("[state]", request.state ?: "")
+                .replace("[token]", jws)
+                .replace("[code]", code)
+                .replace("[state]", request.state ?: "")
         }
         log.debug("Redirecting to {}", redirectTo)
         return "redirect:$redirectTo"
@@ -126,27 +126,27 @@ abstract class OAuthLoginController<out S : OAuthService, T : Token> protected c
 }
 
 fun issueToken(
-        user: User,
-        app: App,
-        scope: Set<String>,
-        appsUrl: String? = null,
-        email: String? = null,
-        name: String? = null,
-        imageURL: String? = null,
-        expiresIn: Long = 6000
+    user: User,
+    app: App,
+    scope: Set<String>,
+    appsUrl: String? = null,
+    email: String? = null,
+    name: String? = null,
+    imageURL: String? = null,
+    expiresIn: Long = 6000
 ): String {
     val jws = Jwts.builder()
-            .setAudience(app.audience)
-            .setSubject(user.username ?: user.accountId)
-            .setIssuedAt(Date())
-            .setIssuer(appsUrl)
-            .claim("email", email ?: user.profileEmail)
-            .claim("name", name ?: user.profileName)
-            .claim("image", (imageURL ?: user.profileImageURL)?.removePrefix("http:"))
-            .claim("scope", scope)
-            .signWith(app.algorithm, app.key)
-            .setExpiration(Date.from(Instant.now().plusSeconds(expiresIn)))
-            .compact()
+        .setAudience(app.audience)
+        .setSubject(user.username ?: user.accountId)
+        .setIssuedAt(Date())
+        .setIssuer(appsUrl)
+        .claim("email", email ?: user.profileEmail)
+        .claim("name", name ?: user.profileName)
+        .claim("image", (imageURL ?: user.profileImageURL)?.removePrefix("http:"))
+        .claim("scope", scope)
+        .signWith(app.algorithm, app.key)
+        .setExpiration(Date.from(Instant.now().plusSeconds(expiresIn)))
+        .compact()
     //log.debug("Issued access token for {} to {} scope {}", app.id, name, scope)
     return jws
 }

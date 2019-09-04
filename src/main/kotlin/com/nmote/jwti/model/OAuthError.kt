@@ -15,6 +15,7 @@
 
 package com.nmote.jwti.model
 
+@Suppress("EnumEntryName", "unused")
 enum class OAuthError {
     invalid_request,
     invalid_client,

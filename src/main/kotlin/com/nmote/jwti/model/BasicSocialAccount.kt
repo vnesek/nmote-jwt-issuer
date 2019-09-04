@@ -49,12 +49,12 @@ open class BasicSocialAccount : SocialAccount<JwtiAccessToken>, Serializable {
     }
 
     constructor(
-            service: String,
-            id: String,
-            name: String? = null,
-            email: String? = null,
-            imageUrl: String? = null,
-            token: Any? = null
+        service: String,
+        id: String,
+        name: String? = null,
+        email: String? = null,
+        imageUrl: String? = null,
+        token: Any? = null
     ) {
         socialService = service
         accountId = id

@@ -28,15 +28,15 @@ import javax.validation.constraints.Email
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class UserData(
-        val id: String,
-        val username: String? = null,
-        val type: String,
-        val name: String? = null,
-        val email: String? = null,
-        val image: String? = null,
-        val roles: Set<String>? = null,
-        val scope: Set<String>? = null,
-        val accounts: List<UserData>? = null)
+    val id: String,
+    val username: String? = null,
+    val type: String,
+    val name: String? = null,
+    val email: String? = null,
+    val image: String? = null,
+    val roles: Set<String>? = null,
+    val scope: Set<String>? = null,
+    val accounts: List<UserData>? = null)
 
 
 class User : SocialAccount<JwtiAccessToken>, Serializable {

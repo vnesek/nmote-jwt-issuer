@@ -15,6 +15,7 @@
 
 package com.nmote.jwti.config
 
+import io.jsonwebtoken.JwtParser
 import io.jsonwebtoken.Jwts
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -24,7 +25,7 @@ import org.springframework.context.annotation.Configuration
 class SecurityConfig {
 
     @Bean
-    fun jwtParser(@Value(value = "\${issuer.secret}") key: String)
-            = Jwts.parser().setSigningKey(key.substringAfter(':'))
+    fun jwtParser(@Value(value = "\${issuer.secret}") key: String): JwtParser = Jwts.parser()
+        .setSigningKey(key.substringAfter(':'))
 
 }

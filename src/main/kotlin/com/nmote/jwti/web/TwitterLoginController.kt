@@ -38,20 +38,20 @@ import javax.servlet.http.HttpServletResponse
 @Controller
 @RequestMapping("/twitter")
 class TwitterLoginController(
-        @Qualifier("twitterOAuthService") service: OAuth10aService,
-        objectMapper: ObjectMapper,
-        users: UserRepository,
-        apps: AppRepository,
-        tokens: TokenCache,
-        scopes: ScopeService
+    @Qualifier("twitterOAuthService") service: OAuth10aService,
+    objectMapper: ObjectMapper,
+    users: UserRepository,
+    apps: AppRepository,
+    tokens: TokenCache,
+    scopes: ScopeService
 ) : OAuthLoginController<OAuth10aService, OAuth1AccessToken>(service, objectMapper, users, apps, tokens, scopes) {
 
     @RequestMapping("callback")
     fun callback(
-            @RequestParam oauth_token: String,
-            @RequestParam oauth_verifier: String,
-            @CookieValue("authState") authState: String,
-            response: HttpServletResponse
+        @RequestParam oauth_token: String,
+        @RequestParam oauth_verifier: String,
+        @CookieValue("authState") authState: String,
+        response: HttpServletResponse
     ): String {
         val requestToken = OAuth1RequestToken(oauth_token, oauth_verifier)
         val accessToken = service.getAccessToken(requestToken, oauth_verifier)

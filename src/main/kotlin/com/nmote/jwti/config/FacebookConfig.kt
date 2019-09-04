@@ -17,6 +17,7 @@ package com.nmote.jwti.config
 
 import com.github.scribejava.apis.FacebookApi
 import com.github.scribejava.core.builder.ServiceBuilder
+import com.github.scribejava.core.oauth.OAuth20Service
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
@@ -28,14 +29,14 @@ class FacebookConfig {
 
     @Bean
     fun facebookOAuthService(
-            @Value("\${issuer.facebook.id}") appId: String,
-            @Value("\${issuer.facebook.scope}") appScope: String,
-            @Value("\${issuer.facebook.secret}") appSecret: String,
-            @Value("\${issuer.facebook.callback}") callbackURI: String
-    ) = ServiceBuilder(appId)
-            .apiSecret(appSecret)
-            .withScope(appScope)
-            .callback(callbackURI)
-            .build(FacebookApi.instance())
+        @Value("\${issuer.facebook.id}") appId: String,
+        @Value("\${issuer.facebook.scope}") appScope: String,
+        @Value("\${issuer.facebook.secret}") appSecret: String,
+        @Value("\${issuer.facebook.callback}") callbackURI: String
+    ): OAuth20Service = ServiceBuilder(appId)
+        .apiSecret(appSecret)
+        .withScope(appScope)
+        .callback(callbackURI)
+        .build(FacebookApi.instance())
 }
 

@@ -22,7 +22,7 @@ import org.springframework.data.mongodb.repository.Query
 import org.springframework.stereotype.Repository
 import java.util.*
 
-@ConditionalOnProperty(value= ["issuer.repository.mongo"], matchIfMissing = true)
+@ConditionalOnProperty(value = ["issuer.repository.mongo"], matchIfMissing = true)
 @Repository
 interface MongoUserRepository : MongoRepository<User, String>, UserRepository {
 

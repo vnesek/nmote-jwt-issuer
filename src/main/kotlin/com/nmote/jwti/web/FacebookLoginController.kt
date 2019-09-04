@@ -38,20 +38,20 @@ import javax.servlet.http.HttpServletResponse
 @Controller
 @RequestMapping("/facebook")
 class FacebookLoginController(
-        @Qualifier("facebookOAuthService") service: OAuth20Service,
-        objectMapper: ObjectMapper,
-        users: UserRepository,
-        apps: AppRepository,
-        tokens: TokenCache,
-        scopes: ScopeService,
-        @Value("\${issuer.facebook.secret}") val appSecret: String
+    @Qualifier("facebookOAuthService") service: OAuth20Service,
+    objectMapper: ObjectMapper,
+    users: UserRepository,
+    apps: AppRepository,
+    tokens: TokenCache,
+    scopes: ScopeService,
+    @Value("\${issuer.facebook.secret}") val appSecret: String
 ) : OAuthLoginController<OAuth20Service, OAuth2AccessToken>(service, objectMapper, users, apps, tokens, scopes) {
 
     @RequestMapping("callback")
     fun callback(
-            @RequestParam code: String,
-            @CookieValue("authState") authState: String,
-            response: HttpServletResponse
+        @RequestParam code: String,
+        @CookieValue("authState") authState: String,
+        response: HttpServletResponse
     ): String {
         val accessToken = service.getAccessToken(code)
         return callback(accessToken, authState, response)
@@ -63,14 +63,12 @@ class FacebookLoginController(
         // Fetch user info
         val fields = "id,email,first_name,last_name,middle_name,name,website"
         val account = facebookClient.fetchObject("me", FacebookAccount::class.java, //
-                Parameter.with("fields", fields))
+            Parameter.with("fields", fields))
         account.accessToken = accessToken
         return account
     }
 
     override val authorizationUrl: String
         get() = service.authorizationUrl
-
-
 }
 

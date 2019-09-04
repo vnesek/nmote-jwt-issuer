@@ -27,9 +27,9 @@ import java.util.*
 @Controller
 @RequestMapping("oauth/token")
 class AuthorizationController(
-        val users: UserRepository,
-        val apps: AppRepository,
-        val scopes: ScopeService
+    val users: UserRepository,
+    val apps: AppRepository,
+    val scopes: ScopeService
 ) {
 
     fun String.basicAuthorization(): Pair<String, String> {
@@ -63,17 +63,17 @@ class AuthorizationController(
         val scope = scopes.scopeFor(user, app)
 
         val jws = issueToken(
-                user,
-                app,
-                scope,
-                apps.url,
-                expiresIn = expiresIn)
+            user,
+            app,
+            scope,
+            apps.url,
+            expiresIn = expiresIn)
 
         return mapOf(
-                "access_token" to jws,
-                "expires_in" to expiresIn,
-                "token_type" to "bearer",
-                "scope" to scope
+            "access_token" to jws,
+            "expires_in" to expiresIn,
+            "token_type" to "bearer",
+            "scope" to scope
         )
     }
 
@@ -92,17 +92,17 @@ class AuthorizationController(
         user.username = client.clientId
 
         val jws = issueToken(
-                user,
-                app,
-                scope,
-                apps.url,
-                expiresIn = expiresIn)
+            user,
+            app,
+            scope,
+            apps.url,
+            expiresIn = expiresIn)
 
         return mapOf(
-                "access_token" to jws,
-                "expires_in" to expiresIn,
-                "token_type" to "bearer",
-                "scope" to scope
+            "access_token" to jws,
+            "expires_in" to expiresIn,
+            "token_type" to "bearer",
+            "scope" to scope
         )
     }
 }

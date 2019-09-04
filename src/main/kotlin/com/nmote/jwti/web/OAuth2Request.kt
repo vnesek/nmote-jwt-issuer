@@ -20,38 +20,38 @@ import com.fasterxml.jackson.annotation.JsonInclude
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class OAuth2Request(
 
-        /**
-         * Value 'code' for authorization code flow
-         */
-        var response_type: String? = null,
+    /**
+     * Value 'code' for authorization code flow
+     */
+    var response_type: String? = null,
 
-        /**
-         * The client identifier as assigned by the authorization server, when the client was registered.
-         */
-        var client_id: String? = null,
+    /**
+     * The client identifier as assigned by the authorization server, when the client was registered.
+     */
+    var client_id: String? = null,
 
-        /**
-         * The redirect URI registered by the client.
-         */
-        var redirect_uri: String? = null,
+    /**
+     * The redirect URI registered by the client.
+     */
+    var redirect_uri: String? = null,
 
-        /**
-         * The possible scope of the request.
-         */
-        var scope: String? = null,
+    /**
+     * The possible scope of the request.
+     */
+    var scope: String? = null,
 
-        /**
-         * Any client state that needs to be passed on to the client request URI.
-         */
-        var state: String? = null,
+    /**
+     * Any client state that needs to be passed on to the client request URI.
+     */
+    var state: String? = null,
 
-        var grant_type: String? = null,
+    var grant_type: String? = null,
 
-        var client_secret: String? = null,
+    var client_secret: String? = null,
 
-        var code: String? = null,
+    var code: String? = null,
 
-        var username: String? = null,
+    var username: String? = null,
 
-        var password: String? = null
+    var password: String? = null
 )
