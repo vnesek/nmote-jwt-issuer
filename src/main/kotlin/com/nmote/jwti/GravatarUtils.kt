@@ -15,9 +15,11 @@
 
 package com.nmote.jwti
 
+import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
-import javax.xml.bind.DatatypeConverter
+import kotlin.math.abs
+
 
 private val HOSTS = arrayOf("0", "1", "2", "3")
 
@@ -26,7 +28,8 @@ private val MD5 = ThreadLocal.withInitial { MessageDigest.getInstance("MD5") }
 private fun hash(src: String): String {
     val s = src.toLowerCase().trim()
     return try {
-        DatatypeConverter.printHexBinary(MD5.get().digest(s.toByteArray(StandardCharsets.UTF_8)))
+        val d = MD5.get().digest(s.toByteArray(StandardCharsets.UTF_8))
+        String.format("%032X", BigInteger(1, d))
     } catch (ignored: Exception) {
         "error"
     }
@@ -35,7 +38,6 @@ private fun hash(src: String): String {
 fun gravatarImageURL(s: String): String {
     val h = hash(s)
     // Rotate between multiple hosts
-    val r = Math.abs(h.hashCode() % HOSTS.size)
+    val r = abs(h.hashCode() % HOSTS.size)
     return String.format("https://%s.gravatar.com/avatar/%s", HOSTS[r], h)
 }
-
