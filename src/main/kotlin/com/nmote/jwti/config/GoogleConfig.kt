@@ -35,7 +35,7 @@ class GoogleConfig {
         @Value("\${issuer.google.callback}") callbackURI: String
     ): OAuth20Service = ServiceBuilder(appId)
         .apiSecret(appSecret)
-        .withScope(appScope)
+        .defaultScope(appScope)
         .callback(callbackURI)
         .build(GoogleApi20.instance())
 }

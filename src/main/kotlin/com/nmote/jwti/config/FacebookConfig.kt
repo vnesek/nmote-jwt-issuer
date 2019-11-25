@@ -35,7 +35,7 @@ class FacebookConfig {
         @Value("\${issuer.facebook.callback}") callbackURI: String
     ): OAuth20Service = ServiceBuilder(appId)
         .apiSecret(appSecret)
-        .withScope(appScope)
+        .defaultScope(appScope)
         .callback(callbackURI)
         .build(FacebookApi.instance())
 }
