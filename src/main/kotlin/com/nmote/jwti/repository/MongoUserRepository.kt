@@ -15,7 +15,7 @@
 
 package com.nmote.jwti.repository
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClient
 import com.nmote.jwti.model.User
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.data.mongodb.repository.MongoRepository
